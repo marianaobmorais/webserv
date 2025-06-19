@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="https://img.shields.io/github/last-commit/marianaobmorais/cub3d?color=%2312bab9&style=flat-square"/>
+	<img src="https://img.shields.io/github/last-commit/joseevilasio/cub3d_42?color=%2312bab9&style=flat-square"/>
 </p>
 
 # Webserv
