@@ -1,21 +1,21 @@
 NAME = webserv
 
-SRCS = srcs/*
+SRCS = srcs/main.cpp srcs/HttpRequest.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+#OBJS = $(SRCS:.cpp=.o)
 
 CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 
 RM = rm -f
 
-$(NAME): $(OBJS)
-		$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(SRCS)
+		$(CXX) $(CXXFLAGS) $(SRCS) -o $(NAME)
 
 all: $(NAME)
 
-%.o: %.cpp
-		$(CXX) $(CXXFLAGS) -c $< -o $@
+#%.o: %.cpp
+#		$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 		$(RM) $(OBJS)
