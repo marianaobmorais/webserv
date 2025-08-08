@@ -2,7 +2,11 @@
 #define HTTP_REQUEST_HPP
 
 #include <string>
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
 #include <map>
+#include <vector>
 
 struct HttpMethod
 {
@@ -24,10 +28,14 @@ class HttpRequest
 
 		//setters
 		void	setHeaders(std::map<std::string, std::string> headers);
-		void	setMethod(HttpMethod::Method method);
+		void	setMethod(const std::string& method);
 		void	setUri(std::string uri);
 		void	setMajor(int major);
 		void	setMinor(int minor);
+
+		//parser
+		std::vector<std::string>	split(const std::string& str, const std::string& sep);
+		void						saveRequestLine(const std::string& str);
 
 	public:
 
@@ -36,14 +44,12 @@ class HttpRequest
 		//add copy assignment?
 		//add copy?
 
-		//parser
-
 		//getters
 		const std::map<std::string, std::string>&	getHeaders(void) const;
 		HttpMethod::Method							getMethod(void) const; //convert string?
 		const std::string&							getUri(void) const;
-		int											getMajor(int major) const;
-		int											getMinor(int minor) const;
+		int											getMajor(void) const;
+		int											getMinor(void) const;
 };
 
 #endif //HTTP_REQUEST_HPP
