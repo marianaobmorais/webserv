@@ -5,7 +5,7 @@ SRCS = srcs/main.cpp srcs/HttpRequest.cpp
 #OBJS = $(SRCS:.cpp=.o)
 
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -I./includes
 
 RM = rm -f
 
