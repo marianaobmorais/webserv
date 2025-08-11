@@ -22,6 +22,13 @@ class HttpRequest
 		std::string					_bodyRef;
 		RequestParseError::reason	_parseError;
 
+		HttpRequest& operator=(const HttpRequest& rhs); //blocked
+		HttpRequest(const HttpRequest& rhs); //blocked
+
+	public:
+		HttpRequest(const std::string& request);
+		~HttpRequest();
+
 		//setters
 		void	setMethod(const RequestMethod::Method& method);
 		void	setUri(const std::string& uri);
@@ -31,10 +38,6 @@ class HttpRequest
 		void	setMeta(const RequestMeta& meta);
 		void	setBodyRef(const std::string& body_ref);
 		void	setParseError(RequestParseError::reason reason);
-
-	public:
-		HttpRequest(const std::string& request);
-		~HttpRequest();
 
 		//getters
 		RequestMethod::Method		getMethod(void) const;
