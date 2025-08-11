@@ -4,7 +4,7 @@
 #include <string>
 
 //webserv
-#include <HttpMethod.hpp>
+#include <RequestMethod.hpp>
 #include <RequestHeader.hpp>
 #include <RequestMeta.hpp>
 #include <RequestParseError.hpp>
@@ -13,7 +13,7 @@
 class HttpRequest
 {
 	private:
-		HttpMethod::Method			_method;
+		RequestMethod::Method		_method;
 		std::string					_uri;
 		int							_major;
 		int							_minor;
@@ -23,7 +23,7 @@ class HttpRequest
 		RequestParseError::reason	_parseError;
 
 		//setters
-		void	setMethod(const HttpMethod::Method& method);
+		void	setMethod(const RequestMethod::Method& method);
 		void	setUri(const std::string& uri);
 		void	setMajor(int major);
 		void	setMinor(int minor);
@@ -37,7 +37,7 @@ class HttpRequest
 		~HttpRequest();
 
 		//getters
-		HttpMethod::Method			getMethod(void) const;
+		RequestMethod::Method		getMethod(void) const;
 		const std::string&			getUri(void) const;
 		int*						getHttpVersion(void) const;
 		const RequestHeader&		getHeaders(void) const;

@@ -4,7 +4,7 @@ HttpRequest::HttpRequest(const std::string& request) {}
 
 HttpRequest::~HttpRequest() {}
 
-void	HttpRequest::setMethod(const HttpMethod::Method& method)
+void	HttpRequest::setMethod(const RequestMethod::Method& method)
 {
 	this->_method = method;
 }
@@ -35,7 +35,7 @@ void	HttpRequest::setParseError(RequestParseError::reason reason)
 	this->_parseError = reason;
 }
 
-HttpMethod::Method	HttpRequest::getMethod(void) const
+RequestMethod::Method	HttpRequest::getMethod(void) const
 {
 	return (this->_method);
 }
