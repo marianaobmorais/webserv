@@ -1,16 +1,20 @@
 NAME = webserv
 
-SRCS = srcs/main.cpp srcs/HttpRequest.cpp
+REQUEST_PATH = srcs/request
+
+SRCS = srcs/main.cpp \
+	$(REQUEST_PATH)/HttpRequest.cpp \
+	$(REQUEST_PATH)/RequestMeta.cpp
 
 #OBJS = $(SRCS:.cpp=.o)
 
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -I./includes
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 
 RM = rm -f
 
 $(NAME): $(SRCS)
-		$(CXX) $(CXXFLAGS) $(SRCS) -o $(NAME)
+		$(CXX) $(CXXFLAGS) -I./includes $(SRCS) -o $(NAME)
 
 all: $(NAME)
 
