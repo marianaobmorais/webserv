@@ -8,7 +8,7 @@ struct RequestParseError
 {
 	enum reason
 	{
-		OK = 0, //Its not successful
+		OK = 0, //Its not successful 2xx
 		BadRequestLine = 400,
 		InvalidMethod = 400,
 		UriTooLong = 414,
