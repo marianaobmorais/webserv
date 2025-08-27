@@ -1,6 +1,14 @@
-#include <HttpRequest.hpp>
+#include "request/HttpRequest.hpp"
 
-HttpRequest::HttpRequest(const std::string& request) {}
+HttpRequest::HttpRequest()
+{
+	setMethod(RequestMethod().INVALID);
+	setParseError(RequestParseError().OK);
+	getMeta().setContentLength(-1);
+	getMeta().setChunked(false);
+	getMeta().setConnectionClose(true);
+	getMeta().setExpectContinue(false);
+}
 
 HttpRequest::~HttpRequest() {}
 
@@ -15,14 +23,21 @@ void	HttpRequest::setMajor(int major) { this->_major = major; }
 
 void	HttpRequest::setMinor(int minor) { this->_minor = minor; }
 
-void	HttpRequest::setHeaders(const RequestHeader& headers)
+void	HttpRequest::addHeader(const std::string& name, const std::string& value)
 {
-	this->_headers = headers;
-}
-
-void	HttpRequest::setMeta(const RequestMeta& meta)
-{
-	this->_meta = meta;
+	//apply lowercase
+	//refactor insertion
+	std::map<std::string, std::string>::iterator it;
+	it = this->_headers.find(name);
+	if (it != _headers.end())
+	{
+		std::string current = it->second;
+		std::string new_ = current + "," + value;
+		_headers.erase(it);
+		_headers[name] = new_;
+	}
+	else
+		_headers[name] = value;
 }
 
 void	HttpRequest::setBodyRef(const std::string& body_ref)
@@ -42,16 +57,21 @@ RequestMethod::Method	HttpRequest::getMethod(void) const
 
 const std::string&	HttpRequest::getUri(void) const { return (this->_uri); }
 
-int*	HttpRequest::getHttpVersion(void) const
+const std::vector<int>	HttpRequest::getHttpVersion(void) const
 {
 	int version[2] = {this->_major, this->_minor};
 
-	return (version);
+	return (std::vector<int>(version, version + 2));
 }
 
-const RequestHeader&	HttpRequest::getHeaders(void) const
+const std::string& HttpRequest::getHeader(const std::string& name) const
 {
-	return (this->_headers);
+	std::map<std::string, std::string>::const_iterator c_it;
+
+	c_it = this->_headers.find(name);
+	if (c_it != this->_headers.end())
+		return (c_it->second);
+	return (name);
 }
 
 const RequestMeta&	HttpRequest::getMeta(void) const
@@ -59,6 +79,10 @@ const RequestMeta&	HttpRequest::getMeta(void) const
 	return (this->_meta);
 }
 
+RequestMeta&	HttpRequest::getMeta(void)
+{
+	return (this->_meta);
+}
 const std::string&	HttpRequest::getBodyRef(void) const
 {
 	return (this->_bodyRef);
