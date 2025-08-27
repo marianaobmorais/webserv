@@ -1,4 +1,4 @@
-#include <RequestMeta.hpp>
+#include "request/RequestMeta.hpp"
 
 RequestMeta::RequestMeta() {}
 
@@ -29,12 +29,12 @@ void	RequestMeta::setHost(const std::string& host)
 	this->_host = host;
 }
 
-int	RequestMeta::getContentLength(void) { return (this->_contentLength); }
+int	RequestMeta::getContentLength(void) const { return (this->_contentLength); }
 
-bool	RequestMeta::getChunked(void) { return (this->_chunked); }
+bool	RequestMeta::isChunked(void) const { return (this->_chunked); }
 
-bool	RequestMeta::getConnectionClose(void) { return (this->_connectionClose); }
+bool	RequestMeta::shouldClose(void) const { return (this->_connectionClose); }
 
-bool	RequestMeta::getExpectContinue(void) { return (this->_expectContinue); }
+bool	RequestMeta::getExpectContinue(void) const { return (this->_expectContinue); }
 
-std::string	RequestMeta::getHost(void) { return (this->_host); }
+std::string	RequestMeta::getHost(void) const { return (this->_host); }

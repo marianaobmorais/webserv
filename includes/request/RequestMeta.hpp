@@ -6,10 +6,10 @@
 class RequestMeta
 {
 	private:
-		int			_contentLength;
-		bool		_chunked;
+		int			_contentLength; // -1 if there is no
+		bool		_chunked; // transfer encoding
 		bool		_connectionClose;
-		bool		_expectContinue;
+		bool		_expectContinue; //expect 100-continue
 		std::string	_host;
 
 		RequestMeta(const RequestMeta& rhs); //blocked
@@ -27,11 +27,11 @@ class RequestMeta
 		void	setHost(const std::string& host);
 
 		//getters
-		int			getContentLength(void);
-		bool		getChunked(void);
-		bool		getConnectionClose(void);
-		bool		getExpectContinue(void);
-		std::string	getHost(void);
+		int			getContentLength(void) const;
+		bool		isChunked(void) const;
+		bool		shouldClose(void) const;
+		bool		getExpectContinue(void) const;
+		std::string	getHost(void) const;
 };
 
 #endif //REQUEST_META_HPP
