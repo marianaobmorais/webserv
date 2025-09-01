@@ -1,6 +1,8 @@
 NAME = webserv
 
-SRCS = srcs/*
+SRCS = srcs/main.cpp \
+		srcs/WebServer.cpp \
+		srcs/ServerSocket.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 
