@@ -21,7 +21,7 @@ int	main(int argc, char** argv)
 	try
 	{
 		WebServer server;
-		server.start();
+		server.startSocket();
 	}
 	catch(const std::exception& e)
 	{
