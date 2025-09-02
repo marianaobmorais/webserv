@@ -1,5 +1,5 @@
 #include "WebServer.hpp"
-#include <sys/socket.h> //socket()
+#include <sys/socket.h> //socket(), setsockopt()
 #include <netdb.h> //getaddrinfo()
 #include <unistd.h> //close() //not sure if there is a C++ alternative
 #include <cstring> //memset()
@@ -10,7 +10,7 @@ WebServer::WebServer(void) : _serverSocket() {}
 
 WebServer::~WebServer(void){}
 
-void		WebServer::start(void)
+void		WebServer::startSocket(void)
 {
 	int				status;
 	int				socketFD;
@@ -43,7 +43,13 @@ void		WebServer::start(void)
 		close(socketFD);
 	}
 	::freeaddrinfo(servInfo);
-	if (tmp == NULL)
-		throw std::runtime_error("error: bind: could not bind"); 
+	if (!tmp)
+		throw std::runtime_error("error: bind: could not bind");
+	int	yes = 1;
+	if (::setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) != 0)
+	{
+		std::string	errorMsg(strerror(errno));
+		throw std::runtime_error("error: setsockopt: " + errorMsg);
+	}
 	this->_serverSocket.setFD(socketFD);
 }
