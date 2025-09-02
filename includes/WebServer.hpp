@@ -6,16 +6,19 @@
 class WebServer
 {
 	private:
-		ServerSocket	_serverSocket; //const? reference?
+		ServerSocket	_serverSocket;
+		//Config		_config; //probably const and reference //later
 		WebServer(WebServer const& src);
-		WebServer&	operator=(WebServer const& rhs);
+		WebServer&		operator=(WebServer const& rhs);
 	public:
 		WebServer(void);
 		~WebServer(void);
 
 		void		start(void); //start socket
-		//void	run(void); //run loop
-		//void	stop(void); //cleanup?
+
+		//later
+		//void		run(void); //run loop
+		//void		stop(void); //cleanup
 };
 
 #endif //WEBSERVER_HPP
