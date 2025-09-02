@@ -43,7 +43,7 @@ void		WebServer::startSocket(void)
 		close(socketFD);
 	}
 	::freeaddrinfo(servInfo);
-	if (!tmp)
+	if (socketFD == -1)
 		throw std::runtime_error("error: bind: could not bind");
 	int	yes = 1;
 	if (::setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) != 0)
