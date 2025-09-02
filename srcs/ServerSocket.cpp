@@ -1,7 +1,15 @@
 #include "ServerSocket.hpp"
+#include <unistd.h>
 
 ServerSocket::ServerSocket(void) : _fd(-1) {}
 
-ServerSocket::ServerSocket(int newFD) : _fd(newFD) {}
+ServerSocket::~ServerSocket(void)
+{
+	if (this->_fd != -1)
+		::close(this->_fd);
+}
 
-ServerSocket::~ServerSocket(void) {}
+void	ServerSocket::setFD(int newFD)
+{
+	this->_fd = newFD;
+}
