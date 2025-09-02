@@ -16,7 +16,18 @@ int	main(int argc, char** argv)
 		configFile = "defautFile"; //create file and put it in the repository?
 	if (argc == 2)
 		configFile = argv[1];
+
 	std::cout << "Instatiate WebServer" << std::endl; //debug
+	try
+	{
+		WebServer server;
+		server.start();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 
 
 
