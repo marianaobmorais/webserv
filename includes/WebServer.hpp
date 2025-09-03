@@ -10,7 +10,7 @@ class WebServer
 	private:
 		//Config						_config; //probably const and reference //later
 		ServerSocket					_serverSocket;
-		std::vector<ClientConnection>	_clients;
+		std::vector<ClientConnection>	_clients; //can also hold fd set to -1
 
 		WebServer(WebServer const& src);
 		WebServer&						operator=(WebServer const& rhs);
