@@ -3,6 +3,8 @@
 
 ClientConnection::ClientConnection(int fd) : _fd(fd) {}
 
+ClientConnection::ClientConnection(ClientConnection const& src) : _fd(src._fd) {}
+
 ClientConnection::~ClientConnection(void)
 {
 	if (this->_fd != -1)
