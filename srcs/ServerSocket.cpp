@@ -64,3 +64,19 @@ void	ServerSocket::listenConnections(int backlog)
 		throw std::runtime_error("listen: listenConnections: " + errorMsg);
 	}
 }
+
+ClientConnection	ServerSocket::acceptConnections(void)
+{
+	struct sockaddr_storage	clientAddr;
+	socklen_t				addrSize;
+	int						clientFD;
+
+	addrSize = sizeof(clientAddr);
+	clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
+	if (clientFD == -1)
+	{
+		std::string	errorMsg(strerror(errno));
+		throw std::runtime_error("error: accept: " + errorMsg);
+	}
+	return (ClientConnection(clientFD));
+}
