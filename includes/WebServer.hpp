@@ -3,6 +3,7 @@
 
 #include "ServerSocket.hpp"
 #include <vector>
+#include <map>
 
 class ClientConnection;
 class WebServer
@@ -10,7 +11,9 @@ class WebServer
 	private:
 		//Config						_config; //probably const and reference //later
 		ServerSocket					_serverSocket;
-		std::vector<ClientConnection>	_clients; //can also hold fd set to -1
+		std::map<int, ClientConnection>	_clients; //can also hold fd set to -1
+		std::vector<struct pollfd>		_pollFDs;
+		//bool							run; //to handle the run loop
 
 		WebServer(WebServer const& src);
 		WebServer&						operator=(WebServer const& rhs);
