@@ -18,7 +18,7 @@ int	main(int argc, char** argv)
 		configFile = argv[1];
 	try
 	{
-		WebServer server;
+		WebServer	server;
 		server.start();
 		server.run();
 	}

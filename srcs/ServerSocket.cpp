@@ -3,8 +3,10 @@
 #include <netdb.h> //getaddrinfo()
 #include <unistd.h> //close() //not sure if there is a C++ alternative
 #include <fcntl.h> //fcntl()
+#include <errno.h>
 #include <cstring> //memset()
 #include <exception>
+#include <stdexcept> //runtime_error
 #include <string>
 
 ServerSocket::ServerSocket(void) : _fd(-1) {}
@@ -28,7 +30,7 @@ void	ServerSocket::bindSocket(std::string const& port)
 	hints.ai_socktype = SOCK_STREAM; //TCP
 	hints.ai_flags = AI_PASSIVE; //Fill IP for me
 
-	if ((status = ::getaddrinfo(NULL, port.c_str(), &hints, &servInfo )) != 0)
+	if ((status = ::getaddrinfo(NULL, port.c_str(), &hints, &servInfo)) != 0)
 	{
 		std::string	errorMsg(gai_strerror(status));
 		throw std::runtime_error("error: getaddrinfo: " + errorMsg);
