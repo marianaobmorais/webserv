@@ -8,6 +8,7 @@ class ServerSocket
 {
 	private:
 		int					_fd;
+
 		ServerSocket(ServerSocket const& src);
 		ServerSocket&		operator=(ServerSocket const& rhs);
 	public:
