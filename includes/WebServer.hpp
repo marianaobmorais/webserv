@@ -14,10 +14,9 @@ class WebServer
 		WebServer(void);
 		~WebServer(void);
 
-		void		startSocket(void);
-
+		void		start(void);
+		void		run(void); //run loop
 		//later
-		//void		run(void); //run loop
 		//void		stop(void); //cleanup
 };
 
