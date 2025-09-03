@@ -2,8 +2,8 @@
 #include <sys/socket.h> //socket(), setsockopt(), listen()
 #include <netdb.h> //getaddrinfo()
 #include <unistd.h> //close() //not sure if there is a C++ alternative
+#include <fcntl.h> //fcntl()
 #include <cstring> //memset()
-#include <unistd.h>
 #include <exception>
 #include <string>
 
@@ -31,7 +31,6 @@ void	ServerSocket::bindSocket(std::string const& port)
 	if ((status = ::getaddrinfo(NULL, port.c_str(), &hints, &servInfo )) != 0)
 	{
 		std::string	errorMsg(gai_strerror(status));
-		::freeaddrinfo(servInfo);
 		throw std::runtime_error("error: getaddrinfo: " + errorMsg);
 	}
 	/* getaddrinfo() returns a list of address structures.
@@ -44,7 +43,13 @@ void	ServerSocket::bindSocket(std::string const& port)
 		if (socketFD == -1)
 			continue ;
 		int	yes = 1;
-		::setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)); //check if != 0? or leave it to the check if (socketFD == -1)?
+		if (::setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) != 0)
+		{
+			::freeaddrinfo(servInfo);
+			::close(socketFD);
+			std::string	errorMsg(strerror(errno));
+			throw std::runtime_error("error: setsockopt: " + errorMsg);
+		}
 		if (::bind(socketFD, tmp->ai_addr, tmp->ai_addrlen) == 0)
 			break ; //sucess
 		::close(socketFD);
@@ -52,7 +57,16 @@ void	ServerSocket::bindSocket(std::string const& port)
 	}
 	::freeaddrinfo(servInfo);
 	if (socketFD == -1)
-		throw std::runtime_error("error: bind: fail to bind");
+	{
+		std::string	errorMsg(strerror(errno));
+		throw std::runtime_error("error: bind: " + errorMsg);
+	}
+	if (::fcntl(socketFD, F_SETFL, O_NONBLOCK) == -1)
+	{
+		::close(socketFD);
+		std::string	errorMsg(strerror(errno));
+		throw std::runtime_error("error: fcntl: " + errorMsg);
+	}
 	this->_fd = socketFD;
 }
 
@@ -75,6 +89,8 @@ ClientConnection	ServerSocket::acceptConnections(void)
 	clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
 	if (clientFD == -1)
 	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet/skip it
+			return (ClientConnection(-1));
 		std::string	errorMsg(strerror(errno));
 		throw std::runtime_error("error: accept: " + errorMsg);
 	}
