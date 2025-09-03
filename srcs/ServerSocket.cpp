@@ -48,7 +48,7 @@ void	ServerSocket::bindSocket(std::string const& port)
 		if (::setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) != 0)
 		{
 			::freeaddrinfo(servInfo);
-			::close(socketFD);
+			::close(socketFD); //close here?
 			std::string	errorMsg(strerror(errno));
 			throw std::runtime_error("error: setsockopt: " + errorMsg);
 		}
@@ -97,4 +97,9 @@ ClientConnection	ServerSocket::acceptConnections(void)
 		throw std::runtime_error("error: accept: " + errorMsg);
 	}
 	return (ClientConnection(clientFD));
+}
+
+int	ServerSocket::getFD(void)
+{
+	return (this->_fd);
 }

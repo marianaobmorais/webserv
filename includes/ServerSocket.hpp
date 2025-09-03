@@ -18,6 +18,9 @@ class ServerSocket
 		void				bindSocket(std::string const& port);
 		void				listenConnections(int backlog);
 		ClientConnection	acceptConnections(void); //accepts clients, producing ClientConnection
+
+		//accesor
+		int				getFD(void);
 };
 
 #endif //SERVERSOCKET_HPP
