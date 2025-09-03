@@ -10,3 +10,8 @@ ClientConnection::~ClientConnection(void)
 	if (this->_fd != -1)
 		::close(this->_fd);
 }
+
+int	ClientConnection::getFD(void)
+{
+	return (this->_fd);
+}

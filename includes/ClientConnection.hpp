@@ -11,6 +11,9 @@ class ClientConnection
 		ClientConnection(int fd);
 		ClientConnection(ClientConnection const& src);
 		~ClientConnection(void);
+
+		//accessor
+		int					getFD(void);
 };
 
 #endif //CLIENTCONNECTION_HPP
