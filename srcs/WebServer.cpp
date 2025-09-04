@@ -30,11 +30,12 @@ void	WebServer::run(void)
 		if (::poll(&this->_pollFDs[0], this->_pollFDs.size(), -1) == -1) //-1 means it won't time out
 		{
 			std::string	errorMsg(strerror(errno));
-			throw std::runtime_error("error: poll: " + errorMsg); //continue ; or throw?
+			throw std::runtime_error("error: poll: " + errorMsg); //continue ; to keep the server alive on temporary errors like EINTR or throw?
 		}
 
 		for (size_t i = 0; i < this->_pollFDs.size(); i++)  // Loop through all monitored FDs
 		{
+			//later: handle resize of this->_pollFDs here?
 			if (this->_pollFDs[i].revents & POLLIN) //POLLIN bit is set, regardless of what other bits may also be se
 			{
 				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
