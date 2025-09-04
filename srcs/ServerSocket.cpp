@@ -8,6 +8,7 @@
 #include <exception>
 #include <stdexcept> //runtime_error
 #include <string>
+#include <iostream>
 
 ServerSocket::ServerSocket(void) : _fd(-1) {}
 
@@ -81,7 +82,55 @@ void	ServerSocket::listenConnections(int backlog)
 	}
 }
 
-std::vector<ClientConnection>	ServerSocket::acceptConnections(void)
+std::vector<int>	ServerSocket::acceptConnections(void)
+{
+	std::vector<int>	newFDs;
+
+	//the kernel doesn’t guarantee that there’s exactly connection to be accepted.
+	//There may be multiple connections queued in the backlog.
+	//This drains the kernel’s pending connection queue in one go.
+	//You don’t need to wait for another poll() cycle to accept the remaining queued clients.
+	while (true)
+	{
+		struct sockaddr_storage	clientAddr;
+		socklen_t				addrSize;
+		int						clientFD;
+
+		addrSize = sizeof(clientAddr);
+		clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
+		if (clientFD == -1)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet -> break
+				break ;
+			std::string	errorMsg(strerror(errno));
+			std::cerr << "error: accept: " << errorMsg << '\n';
+			break ; //will return fds anyway?
+			//throw std::runtime_error("error: accept: " + errorMsg);
+		}
+		//Set client sockets to non-blocking. The new fd got from accept() may not 
+		//inherit non-blocking on all platforms
+		if (::fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1)
+		{
+			::close(clientFD);
+			std::string	errorMsg(strerror(errno));
+			std::cerr << "error: fcntl: " << errorMsg << '\n';
+			continue ; //skip this client? or break ;?
+			//throw std::runtime_error("error: acceptConnections: fcntl: " + errorMsg);
+		}
+		try
+		{
+			newFDs.push_back(clientFD);
+		}
+		catch (std::exception const& e)
+		{
+			::close(clientFD);
+			std::cerr << "error: " << e.what() << '\n';
+		}
+	}
+	return (newFDs);
+}
+
+/* std::vector<ClientConnection>	ServerSocket::acceptConnections(void)
 {
 	std::vector<ClientConnection>	newClients;
 
@@ -99,7 +148,7 @@ std::vector<ClientConnection>	ServerSocket::acceptConnections(void)
 		clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
 		if (clientFD == -1)
 		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet -> skip it
+			if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet -> break
 				break ;
 			std::string	errorMsg(strerror(errno));
 			throw std::runtime_error("error: accept: " + errorMsg);
@@ -115,7 +164,7 @@ std::vector<ClientConnection>	ServerSocket::acceptConnections(void)
 		newClients.push_back(ClientConnection(clientFD));
 	}
 	return (newClients);
-}
+} */
 
 int	ServerSocket::getFD(void)
 {
