@@ -15,7 +15,7 @@ void		WebServer::start(void)
 	this->_serverSocket.bindSocket("8080"); //this parameter will be from config file probably
 	this->_serverSocket.listenConnections(SOMAXCONN);
 
-	//start poll vector
+	//start _pollFDs vector
 	struct pollfd	serverPollFD;
 	serverPollFD.fd = this->_serverSocket.getFD();
 	serverPollFD.events = POLLIN; // monitor for incoming connections
@@ -41,16 +41,19 @@ void	WebServer::run(void)
 				{
 					try
 					{
-						ClientConnection	newClient = this->_serverSocket.acceptConnections(); //accepts the connection
-						int					newClientFD = newClient.getFD();
-						this->_clients.insert(std::make_pair(newClientFD, newClient)); // saves the client object in _clients
+						std::vector<ClientConnection>	newClients = this->_serverSocket.acceptConnections(); //accepts the connections
+						for (size_t j = 0; j < newClients.size(); j++)
+						{
+							int	newClientFD = newClients[j].getFD();
+							this->_clients.insert(std::make_pair(newClientFD, newClients[j])); // saves the client object in _clients
 
-						//Add to pollFDs
-						struct pollfd	newPollFD;
-						newPollFD.fd = newClientFD;
-						newPollFD.events = POLLIN; // monitor for incoming data
-						newPollFD.revents = 0;
-						this->_pollFDs.push_back(newPollFD); //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
+							//Add to pollFDs
+							struct pollfd	newPollFD;
+							newPollFD.fd = newClientFD;
+							newPollFD.events = POLLIN; // monitor for incoming data
+							newPollFD.revents = 0;
+							this->_pollFDs.push_back(newPollFD); //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
+						}
 					}
 					catch(const std::exception& e)
 					{
@@ -66,7 +69,7 @@ void	WebServer::run(void)
 			}
 			else //!(this->_pollFDs[i].revents & POLLIN)
 			{
-				
+				//later
 			}
 		}
 	}
