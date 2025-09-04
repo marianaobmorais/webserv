@@ -81,22 +81,40 @@ void	ServerSocket::listenConnections(int backlog)
 	}
 }
 
-ClientConnection	ServerSocket::acceptConnections(void)
+std::vector<ClientConnection>	ServerSocket::acceptConnections(void)
 {
-	struct sockaddr_storage	clientAddr;
-	socklen_t				addrSize;
-	int						clientFD;
+	std::vector<ClientConnection>	newClients;
 
-	addrSize = sizeof(clientAddr);
-	clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
-	if (clientFD == -1)
+	//the kernel doesn’t guarantee that there’s exactly connection to be accepted.
+	//There may be multiple connections queued in the backlog.
+	//This drains the kernel’s pending connection queue in one go.
+	//You don’t need to wait for another poll() cycle to accept the remaining queued clients.
+	while (true)
 	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet/skip it
-			return (ClientConnection(-1));
-		std::string	errorMsg(strerror(errno));
-		throw std::runtime_error("error: accept: " + errorMsg);
+		struct sockaddr_storage	clientAddr;
+		socklen_t				addrSize;
+		int						clientFD;
+
+		addrSize = sizeof(clientAddr);
+		clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
+		if (clientFD == -1)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet -> skip it
+				break ;
+			std::string	errorMsg(strerror(errno));
+			throw std::runtime_error("error: accept: " + errorMsg);
+		}
+		//Set client sockets to non-blocking. The new fd got from accept() may not 
+		//inherit non-blocking on all platforms
+		if (::fcntl(clientFD, F_SETFL, O_NONBLOCK) == -1)
+		{
+			::close(clientFD);
+			std::string	errorMsg(strerror(errno));
+			throw std::runtime_error("error: acceptConnections: fcntl: " + errorMsg);
+		}
+		newClients.push_back(ClientConnection(clientFD));
 	}
-	return (ClientConnection(clientFD));
+	return (newClients);
 }
 
 int	ServerSocket::getFD(void)
