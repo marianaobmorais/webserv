@@ -56,9 +56,30 @@ void	WebServer::run(void)
 				}
 				else //If it wasn’t the server socket, then it must be one of the client sockets
 				{
-					//will do later //read
-					//Existing client has data
-					std::cout << "Client FD " << this->_pollFDs[i].fd << " has data ready" << std::endl;
+					//std::cout << "Client FD " << this->_pollFDs[i].fd << " has data ready" << std::endl;
+					std::map<int, ClientConnection>::iterator	it;
+					it = this->_clients.find(_pollFDs[i].fd);
+					if (it != this->_clients.end()) //I don't understand this check
+						ClientConnection	&client = it->second;
+
+					char	buffer[1024];
+					ssize_t	bytesRecv = recv(_pollFDs[i].fd, buffer, sizeof(buffer), 0);
+
+					if (bytesRecv > 0)
+						//handle request
+					if (bytesRecv == 0)
+					{
+						; //client closed connection
+					}
+					else
+					{
+						if (errno == EAGAIN || errno == EWOULDBLOCK)
+							; //continue ; probably
+						else
+							; //client closed the connection
+					}
+					
+
 				}
 			}
 			else //!(this->_pollFDs[i].revents & POLLIN)
