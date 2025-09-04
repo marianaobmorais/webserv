@@ -5,8 +5,8 @@ class ClientConnection
 {
 	private:
 		int					_fd;
-		std::string			_readBuffer;
-		std::string			_writeBuffer;
+		std::string			_recvBuffer;
+		std::string			_sendBuffer;
 		//time_t				_lastActive;
 
 		ClientConnection&	operator=(ClientConnection const& rhs);
