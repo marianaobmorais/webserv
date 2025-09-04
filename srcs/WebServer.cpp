@@ -30,7 +30,7 @@ void	WebServer::run(void)
 		if (::poll(&this->_pollFDs[0], this->_pollFDs.size(), -1) == -1) //-1 means it won't time out
 		{
 			std::string	errorMsg(strerror(errno));
-			throw std::runtime_error("error: poll: " + errorMsg);
+			throw std::runtime_error("error: poll: " + errorMsg); //continue ; or throw?
 		}
 
 		for (size_t i = 0; i < this->_pollFDs.size(); i++)  // Loop through all monitored FDs
@@ -39,25 +39,18 @@ void	WebServer::run(void)
 			{
 				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
 				{
-					try
+					std::vector<int>	newFDs = this->_serverSocket.acceptConnections(); //accepts the connections
+					for (size_t j = 0; j < newFDs.size(); j++)
 					{
-						std::vector<ClientConnection>	newClients = this->_serverSocket.acceptConnections(); //accepts the connections
-						for (size_t j = 0; j < newClients.size(); j++)
-						{
-							int	newClientFD = newClients[j].getFD();
-							this->_clients.insert(std::make_pair(newClientFD, newClients[j])); // saves the client object in _clients
+						int	newClientFD = newFDs[j];
+						this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD))); // saves the client object in _clients
 
-							//Add to pollFDs
-							struct pollfd	newPollFD;
-							newPollFD.fd = newClientFD;
-							newPollFD.events = POLLIN; // monitor for incoming data
-							newPollFD.revents = 0;
-							this->_pollFDs.push_back(newPollFD); //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
-						}
-					}
-					catch(const std::exception& e)
-					{
-						std::cerr << e.what() << '\n';
+						//Add to pollFDs
+						struct pollfd	newPollFD;
+						newPollFD.fd = newClientFD;
+						newPollFD.events = POLLIN; // monitor for incoming data
+						newPollFD.revents = 0;
+						this->_pollFDs.push_back(newPollFD); //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
 					}
 				}
 				else //If it wasn’t the server socket, then it must be one of the client sockets
@@ -69,7 +62,7 @@ void	WebServer::run(void)
 			}
 			else //!(this->_pollFDs[i].revents & POLLIN)
 			{
-				//later
+				//later //how to handle resizing of this->_pollFDs?
 			}
 		}
 	}
