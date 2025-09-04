@@ -4,7 +4,7 @@
 #include <unistd.h> //close() //not sure if there is a C++ alternative
 #include <fcntl.h> //fcntl()
 #include <errno.h>
-#include <cstring> //memset()
+#include <cstring> //memset(), strerror()
 #include <exception>
 #include <stdexcept> //runtime_error
 #include <string>
