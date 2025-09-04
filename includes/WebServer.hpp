@@ -21,10 +21,10 @@ class WebServer
 		WebServer(void);
 		~WebServer(void);
 
-		void						start(void);
-		void						run(void); //run loop
+		void							start(void);
+		void							run(void); //run loop
 		//later
-		//void						stop(void); //cleanup
+		//void							stop(void); //cleanup
 };
 
 #endif //WEBSERVER_HPP
