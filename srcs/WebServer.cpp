@@ -14,17 +14,17 @@ void		WebServer::start(void)
 {
 	this->_serverSocket.bindSocket("8080"); //this parameter will be from config file probably
 	this->_serverSocket.listenConnections(SOMAXCONN);
-}
 
-void	WebServer::run(void)
-{
-	//should I put this bit in the start method?
+	//start poll vector
 	struct pollfd	serverPollFD;
 	serverPollFD.fd = this->_serverSocket.getFD();
 	serverPollFD.events = POLLIN; // monitor for incoming connections
 	serverPollFD.revents = 0;
 	this->_pollFDs.push_back(serverPollFD); // the server's listening socket is always the first [0], the client ones start from index 1
+}
 
+void	WebServer::run(void)
+{
 	while (true)
 	{
 		if (::poll(&this->_pollFDs[0], this->_pollFDs.size(), -1) == -1) //-1 means it won't time out
@@ -35,34 +35,38 @@ void	WebServer::run(void)
 
 		for (size_t i = 0; i < this->_pollFDs.size(); i++)  // Loop through all monitored FDs
 		{
-			if (this->_pollFDs[i].revents & POLLIN)
+			if (this->_pollFDs[i].revents & POLLIN) //POLLIN bit is set, regardless of what other bits may also be se
 			{
 				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
 				{
 					try
 					{
-						ClientConnection	newClient = this->_serverSocket.acceptConnections();
+						ClientConnection	newClient = this->_serverSocket.acceptConnections(); //accepts the connection
 						int					newClientFD = newClient.getFD();
-						this->_clients.insert(std::make_pair(newClientFD, newClient));
+						this->_clients.insert(std::make_pair(newClientFD, newClient)); // saves the client object in _clients
 
 						//Add to pollFDs
 						struct pollfd	newPollFD;
 						newPollFD.fd = newClientFD;
 						newPollFD.events = POLLIN; // monitor for incoming data
 						newPollFD.revents = 0;
-						this->_pollFDs.push_back(newPollFD);
+						this->_pollFDs.push_back(newPollFD); //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
 					}
 					catch(const std::exception& e)
 					{
 						std::cerr << e.what() << '\n';
 					}
 				}
+				else //If it wasn’t the server socket, then it must be one of the client sockets
+				{
+					//will do later //read
+					//Existing client has data
+					std::cout << "Client FD " << this->_pollFDs[i].fd << " has data ready" << std::endl;
+				}
 			}
-			else
+			else //!(this->_pollFDs[i].revents & POLLIN)
 			{
-				//will do later
-				//Existing client has data
-				std::cout << "Client FD " << this->_pollFDs[i].fd << " has data ready" << std::endl;
+				
 			}
 		}
 	}
