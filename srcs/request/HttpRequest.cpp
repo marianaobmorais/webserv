@@ -2,8 +2,8 @@
 
 HttpRequest::HttpRequest()
 {
-	setMethod(RequestMethod().INVALID);
-	setParseError(RequestParseError().OK);
+	setMethod(RequestMethod::INVALID);
+	setParseError(RequestParseError::OK);
 	getMeta().setContentLength(-1);
 	getMeta().setChunked(false);
 	getMeta().setConnectionClose(true);
