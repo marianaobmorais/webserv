@@ -13,8 +13,13 @@ class RequestParse
 		RequestParse(const RequestParse& rhs); //blocked
 		RequestParse& operator=(const RequestParse& rhs); //blocked
 
+		static std::vector<std::string>	split(const std::string& str, const std::string& sep);
+		static void						requestLine(const std::string& str, HttpRequest& request);
+		static void						method(const std::string& method, HttpRequest& request);
+		static void						headers(const std::string& method, HttpRequest& request);
+
 	public:
-		static const HttpRequest& handleRawRequest(const std::string& rawRequest);
+		static void	handleRawRequest(const std::string& rawRequest, HttpRequest& request);
 };
 
 #endif //REQUEST_PARSE_HPP
