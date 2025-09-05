@@ -23,6 +23,8 @@ class WebServer
 
 		void							start(void);
 		void							run(void); //run loop
+		void							addToPollFD(int fd, short events);
+		void							removeClientConnection(int clientFD, size_t poolFDIndex);
 		//later
 		//void							stop(void); //cleanup
 };
