@@ -98,6 +98,9 @@ std::vector<int>	ServerSocket::acceptConnections(void)
 
 		addrSize = sizeof(clientAddr);
 		clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
+
+		//std::cout << "accept() returned fd: " << clientFD << std::endl; //debug
+
 		if (clientFD == -1)
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet -> break
@@ -105,7 +108,6 @@ std::vector<int>	ServerSocket::acceptConnections(void)
 			std::string	errorMsg(strerror(errno));
 			std::cerr << "error: accept: " << errorMsg << '\n';
 			break ; //will return fds anyway?
-			//throw std::runtime_error("error: accept: " + errorMsg);
 		}
 		//Set client sockets to non-blocking. The new fd got from accept() may not 
 		//inherit non-blocking on all platforms
@@ -114,8 +116,7 @@ std::vector<int>	ServerSocket::acceptConnections(void)
 			::close(clientFD);
 			std::string	errorMsg(strerror(errno));
 			std::cerr << "error: fcntl: " << errorMsg << '\n';
-			continue ; //skip this client? or break ;?
-			//throw std::runtime_error("error: acceptConnections: fcntl: " + errorMsg);
+			continue ; //skip this client
 		}
 		try
 		{
