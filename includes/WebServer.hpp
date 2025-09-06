@@ -15,15 +15,16 @@ class WebServer
 		std::vector<struct pollfd>		_pollFDs;
 		//bool							run; //to handle the run loop
 
-		WebServer(WebServer const& src);
-		WebServer&						operator=(WebServer const& rhs);
+		WebServer(WebServer const& src); //memmove?
+		WebServer&						operator=(WebServer const& rhs); //memmove?
 	public:
 		WebServer(void);
 		~WebServer(void);
 
-		void							start(void);
-		void							run(void); //run loop
+		void							startServer(void);
+		void							runServer(void); //run loop
 		void							addToPollFD(int fd, short events);
+		//void							handleRevents();
 		void							removeClientConnection(int clientFD, size_t poolFDIndex);
 		//later
 		//void							stop(void); //cleanup
