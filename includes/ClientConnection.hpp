@@ -11,10 +11,10 @@ class ClientConnection
 		std::string			_sendBuffer;
 		//time_t				_lastActive;
 
-		ClientConnection&	operator=(ClientConnection const& rhs);
+		ClientConnection&	operator=(ClientConnection const& rhs); //memmove?
 	public:
 		ClientConnection(int fd);
-		ClientConnection(ClientConnection const& src);
+		ClientConnection(ClientConnection const& src); //memmove?
 		~ClientConnection(void);
 
 		ssize_t				recvData(void);
