@@ -43,8 +43,17 @@ ssize_t	ClientConnection::recvData(void)
 
 bool	ClientConnection::completedRequest(void)
 {
-	//I will also get at least POST and DELETE requests
-	return (_recvBuffer.find("\r\n\r\n") != std::string::npos);
+	//GET
+	if (_recvBuffer.find("\r\n\r\n") != std::string::npos)
+		return (true);
+
+	//POST
+	//if()
+
+	//DELETE
+	//if()
+
+	return (false);
 }
 
 
