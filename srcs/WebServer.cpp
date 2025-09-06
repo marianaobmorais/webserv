@@ -11,9 +11,9 @@ WebServer::WebServer(void) : _serverSocket() {}
 
 WebServer::~WebServer(void){}
 
-void	WebServer::start(void)
+void	WebServer::startServer(void)
 {
-	this->_serverSocket.bindSocket("8080"); //this parameter will be from config file probably
+	this->_serverSocket.startSocket("8080"); //this parameter will be from config file probably
 	this->_serverSocket.listenConnections(SOMAXCONN);
 
 	//start _pollFDs vector
@@ -21,24 +21,30 @@ void	WebServer::start(void)
 	this->addToPollFD(this->_serverSocket.getFD(), POLLIN); // monitor for incoming connections
 }
 
-void	WebServer::run(void)
+void	WebServer::runServer(void)
 {
 	while (true)
 	{
-		if (::poll(&this->_pollFDs[0], this->_pollFDs.size(), -1) == -1) //-1 means it won't time out
+		int	ready = ::poll(&this->_pollFDs[0], this->_pollFDs.size(), 1000); //check every second?
+		time_t	now = time(NULL);
+
+		if (ready == -1) //-1 means it won't time out
 		{
 			if (errno == EINTR) //are there other "harmless/temporary errors"?
 				continue ;
 			std::string	errorMsg(strerror(errno));
 			throw std::runtime_error("error: poll: " + errorMsg);
 		}
-
-		//std::cout << "clients: " << _clients.size() << " pollFDs: " << _pollFDs.size() << std::endl; //debug
+		if (ready == 0) //poll timed out
+		{
+			std::cout << "Check how long each CGI process has been running" << std::endl; //TODO
+		}
 
 		for (size_t i = 0; i < this->_pollFDs.size(); i++)  // Loop through all monitored FDs
 		{
 			if (this->_pollFDs[i].revents & POLLIN) //check if POLLIN bit is set, regardless of what other bits may also be set
 			{
+				//queue clients
 				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
 				{
 					std::vector<int>	newFDs = this->_serverSocket.acceptConnections(); //accepts the connections
@@ -55,7 +61,7 @@ void	WebServer::run(void)
 						}
 					}
 				}
-				else //If it wasn’t the server socket, then it must be one of the client sockets
+				else //If it wasn’t the server socket, then it must be one of the client sockets //receive request
 				{
 					//std::cout << "Try to read data from fd: " << _pollFDs[i].fd << std::endl; //debug
 
