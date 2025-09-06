@@ -19,8 +19,8 @@ int	main(int argc, char** argv)
 	try
 	{
 		WebServer	server;
-		server.start();
-		server.run();
+		server.startServer();
+		server.runServer();
 	}
 	catch(const std::exception& e)
 	{
