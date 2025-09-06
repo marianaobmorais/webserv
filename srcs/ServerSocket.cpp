@@ -18,7 +18,7 @@ ServerSocket::~ServerSocket(void)
 		::close(this->_fd);
 }
 
-void	ServerSocket::bindSocket(std::string const& port)
+void	ServerSocket::startSocket(std::string const& port)
 {
 	int				status;
 	int				socketFD;
