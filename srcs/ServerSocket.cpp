@@ -99,8 +99,6 @@ std::vector<int>	ServerSocket::acceptConnections(void)
 		addrSize = sizeof(clientAddr);
 		clientFD = accept(this->_fd, (struct sockaddr*)&clientAddr, &addrSize);
 
-		//std::cout << "accept() returned fd: " << clientFD << std::endl; //debug
-
 		if (clientFD == -1)
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK) //no client ready yet -> break
