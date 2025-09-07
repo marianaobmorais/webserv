@@ -4,7 +4,8 @@ REQUEST_PATH = srcs/request
 
 SRCS = srcs/main.cpp \
 	$(REQUEST_PATH)/HttpRequest.cpp \
-	$(REQUEST_PATH)/RequestMeta.cpp
+	$(REQUEST_PATH)/RequestMeta.cpp  \
+	$(REQUEST_PATH)/RequestParse.cpp
 
 #OBJS = $(SRCS:.cpp=.o)
 
