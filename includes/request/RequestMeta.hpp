@@ -9,7 +9,7 @@ class RequestMeta
 		int			_contentLength; // -1 if there is no
 		bool		_chunked; // transfer encoding
 		bool		_connectionClose;
-		bool		_expectContinue; //expect 100-continue
+		bool		_expectContinue; //expect 100-continue //before send body
 		std::string	_host;
 
 		RequestMeta(const RequestMeta& rhs); //blocked
