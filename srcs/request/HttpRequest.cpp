@@ -6,8 +6,9 @@ HttpRequest::HttpRequest()
 	setParseError(RequestParseError::OK);
 	getMeta().setContentLength(-1);
 	getMeta().setChunked(false);
-	getMeta().setConnectionClose(true);
+	getMeta().setConnectionClose(false);
 	getMeta().setExpectContinue(false);
+	setRequestState(RequestState::RequestLine);
 }
 
 HttpRequest::~HttpRequest() {}
@@ -25,7 +26,6 @@ void	HttpRequest::setMinor(int minor) { this->_minor = minor; }
 
 void	HttpRequest::addHeader(const std::string& name, const std::string& value)
 {
-	//apply lowercase
 	//refactor insertion
 	std::map<std::string, std::string>::iterator it;
 	it = this->_headers.find(name);
@@ -40,14 +40,29 @@ void	HttpRequest::addHeader(const std::string& name, const std::string& value)
 		_headers[name] = value;
 }
 
-void	HttpRequest::setBodyRef(const std::string& body_ref)
+void	HttpRequest::appendBody(const std::string& body)
 {
-	this->_bodyRef = body_ref;
+	this->_body += body;
+}
+
+void	HttpRequest::appendBody(char c)
+{
+	this->_body.push_back(c);
 }
 
 void	HttpRequest::setParseError(RequestParseError::reason reason)
 {
 	this->_parseError = reason;
+}
+
+void	HttpRequest::setRequestState(RequestState::state state)
+{
+	this->_state = state;
+}
+
+void	HttpRequest::appendRaw(const std::string& chunk)
+{
+	this->_rawRequest += chunk;
 }
 
 RequestMethod::Method	HttpRequest::getMethod(void) const
@@ -83,12 +98,22 @@ RequestMeta&	HttpRequest::getMeta(void)
 {
 	return (this->_meta);
 }
-const std::string&	HttpRequest::getBodyRef(void) const
+const std::string&	HttpRequest::getBody(void) const
 {
-	return (this->_bodyRef);
+	return (this->_body);
 }
 
 RequestParseError::reason	HttpRequest::getParseError(void) const
 {
 	return (this->_parseError);
+}
+
+RequestState::state	HttpRequest::getState(void) const
+{
+	return (this->_state);
+}
+
+std::string&	HttpRequest::getRaw(void)
+{
+	return (this->_rawRequest);
 }

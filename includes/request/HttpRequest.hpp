@@ -6,9 +6,10 @@
 #include <vector>
 
 //webserv
-#include "request/RequestMethod.hpp"
-#include "request/RequestMeta.hpp"
-#include "request/RequestParseError.hpp"
+#include <request/RequestMethod.hpp>
+#include <request/RequestMeta.hpp>
+#include <request/RequestParseError.hpp>
+#include <request/RequestState.hpp>
 
 //Data Transfer Object
 class HttpRequest
@@ -20,8 +21,10 @@ class HttpRequest
 		int									_minor;
 		std::map<std::string, std::string>	_headers;
 		RequestMeta							_meta;
-		std::string							_bodyRef; //TODO
+		std::string							_body;
 		RequestParseError::reason			_parseError;
+		RequestState::state					_state;
+		std::string							_rawRequest;
 
 	public:
 		HttpRequest();
@@ -34,9 +37,12 @@ class HttpRequest
 		void	setUri(const std::string& uri);
 		void	setMajor(int major);
 		void	setMinor(int minor);
-		void	setBodyRef(const std::string& body_ref);
+		void	appendBody(const std::string& body);
+		void	appendBody(char c);
 		void	setParseError(RequestParseError::reason reason);
 		void	addHeader(const std::string& name, const std::string& value);
+		void	setRequestState(RequestState::state state);
+		void	appendRaw(const std::string& chunk);
 
 		//getters
 		RequestMethod::Method		getMethod(void) const;
@@ -44,9 +50,11 @@ class HttpRequest
 		const std::vector<int>		getHttpVersion(void) const;
 		const RequestMeta&			getMeta(void) const;
 		RequestMeta&				getMeta(void);
-		const std::string&			getBodyRef(void) const; //TODO
+		const std::string&			getBody(void) const;
 		RequestParseError::reason	getParseError(void) const;
 		const std::string&			getHeader(const std::string& name) const;
+		RequestState::state			getState(void) const;
+		std::string&				getRaw(void);
 };
 
 #endif //HTTP_REQUEST_HPP
