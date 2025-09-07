@@ -21,86 +21,108 @@ void	WebServer::startServer(void)
 	this->addToPollFD(this->_serverSocket.getFD(), POLLIN); // monitor for incoming connections
 }
 
+//HELPER FUNCTION
+static int	getPollTimeout(bool CGI) //refactor later
+{
+	if (!CGI)
+		return (-1); //no timeout
+	else
+		return (10000); //10 seconds
+}
+//
+
 void	WebServer::runServer(void)
 {
 	while (true)
 	{
-		int	ready = ::poll(&this->_pollFDs[0], this->_pollFDs.size(), 1000); //check every second?
-		time_t	now = time(NULL);
+		int timeout = getPollTimeout(false); //update poll() timeout parameter accordingly to the presence of CGI process
+		int	ready = ::poll(&this->_pollFDs[0], this->_pollFDs.size(), timeout);
+		//time_t	now = time(NULL); //to compare with CGI start time
 
-		if (ready == -1) //-1 means it won't time out
+		if (ready == -1) //error
 		{
-			if (errno == EINTR) //are there other "harmless/temporary errors"?
-				continue ;
+			// if (errno == EINTR) //"harmless/temporary error"?
+			// 	continue ;
 			std::string	errorMsg(strerror(errno));
 			throw std::runtime_error("error: poll: " + errorMsg);
 		}
 		if (ready == 0) //poll timed out
 		{
-			std::cout << "Check how long each CGI process has been running" << std::endl; //TODO
+			//TODO //Check how long each CGI process has been running, remove zombie processes
 		}
 
-		for (size_t i = 0; i < this->_pollFDs.size(); i++)  // Loop through all monitored FDs
+		const size_t	readySize = this->_pollFDs.size();
+		for (size_t i = 0; i < readySize; i++)  // Loop through all poll monitored FDs
 		{
 			if (this->_pollFDs[i].revents & POLLIN) //check if POLLIN bit is set, regardless of what other bits may also be set
 			{
-				//queue clients
 				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
+					this->queueClientConnections();
+				else //If it wasn’t the server socket, then it must be one of the client sockets
 				{
-					std::vector<int>	newFDs = this->_serverSocket.acceptConnections(); //accepts the connections
-					for (size_t j = 0; j < newFDs.size(); j++)
-					{
-						int	newClientFD = newFDs[j];
-						if (_clients.find(newClientFD) == _clients.end()) //avoid duplicates
-						{
-							this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD))); //should I create a method that saves the client object in _clients?
-							//std::cout << "populate client map with fd: " << newClientFD << std::endl; //debug
-
-							//Add to pollFDs //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
-							this->addToPollFD(newClientFD, POLLIN);
-						}
-					}
-				}
-				else //If it wasn’t the server socket, then it must be one of the client sockets //receive request
-				{
-					//std::cout << "Try to read data from fd: " << _pollFDs[i].fd << std::endl; //debug
-
-					std::map<int, ClientConnection>::iterator	it;
-					it = this->_clients.find(_pollFDs[i].fd);
-					if (it != this->_clients.end()) //I don't understand this check //is there a chance that this check is false?
-					{
-						ClientConnection	&client = it->second;
-						try
-						{
-							ssize_t				bytesRecv = client.recvData();
-
-							if (bytesRecv > 0)
-							{
-								if (client.completedRequest())
-									//std::cout << "Handle HTTP parse" << std::endl; //TODO
-									std::cout << client.getRecvBuffer() << std::endl;
-							}
-							else if (bytesRecv == 0)
-							{
-								this->removeClientConnection(client.getFD(), i);
-								i--;
-							}
-						}
-						catch (std::exception const& e)
-						{
-							std::cerr << e.what() << '\n'; //error
-							this->removeClientConnection(client.getFD(), i);
-							i--;
-						}
-					}
+					if (!this->receiveRequest(i))
+						i--;
 				}
 			}
-			else //!(this->_pollFDs[i].revents & POLLIN)
+			else
 			{
-				; //later //how to handle resizing of this->_pollFDs?
+				if (_pollFDs[i].revents & POLLOUT) //handle send()
+					; //TODO
+				else
+					;
 			}
 		}
 	}
+}
+
+void	WebServer::queueClientConnections(void)
+{
+	std::vector<int>	newFDs = this->_serverSocket.acceptConnections(); //accepts the connections
+	for (size_t j = 0; j < newFDs.size(); j++)
+	{
+		int	newClientFD = newFDs[j];
+		if (_clients.find(newClientFD) == _clients.end()) //avoid adding duplicates
+		{
+			//new client connection
+			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD)));
+
+			//Add to pollFDs //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
+			this->addToPollFD(newClientFD, POLLIN);
+		}
+	}
+}
+
+bool	WebServer::receiveRequest(size_t i)
+{
+	std::map<int, ClientConnection>::iterator	it;
+	it = this->_clients.find(_pollFDs[i].fd);
+	if (it != this->_clients.end())
+	{
+		ClientConnection	&client = it->second;
+		try
+		{
+			ssize_t	bytesRecv = client.recvData();
+
+			if (bytesRecv > 0)
+			{
+				if (client.completedRequest())
+					std::cout << client.getRecvBuffer() << std::endl; //TODO
+			}
+			else if (bytesRecv == 0)
+			{
+				this->removeClientConnection(client.getFD(), i);
+				return (false);
+			}
+		}
+		catch (std::exception const& e)
+		{
+			std::cerr << "error: " << e.what() << '\n';
+			this->removeClientConnection(client.getFD(), i);
+			return (false);
+		}
+		return (true);
+	}
+	return (false);
 }
 
 void	WebServer::removeClientConnection(int clientFD, size_t poolFDIndex)
