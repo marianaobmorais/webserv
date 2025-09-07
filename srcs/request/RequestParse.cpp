@@ -120,10 +120,7 @@ void	RequestParse::headers(const std::string& buffer, HttpRequest& request)
 							? buffer.substr(pos + 1) : std::string()));
 
 	if (key == "host")
-	{
-		request.setUri(value + request.getUri()); //TODO 
 		request.getMeta().setHost(value);
-	}
 	else if (key == "content-length")
 		request.getMeta().setContentLength(std::atoi(value.c_str()));
 	else if (key == "transfer-encoding")
@@ -147,6 +144,5 @@ void	RequestParse::body(char c, HttpRequest& request)
 		request.appendBody(c);
 		if ((int) request.getBody().size() >= request.getMeta().getContentLength())
 			request.setRequestState(RequestState::Complete);
-
 	}
 }
