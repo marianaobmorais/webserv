@@ -7,8 +7,8 @@ class ClientConnection
 {
 	private:
 		int					_fd;
-		std::string			_recvBuffer;
-		std::string			_sendBuffer;
+		std::string			_requestBuffer;
+		std::string			_responseBuffer;
 		//time_t				_lastActive;
 
 		ClientConnection&	operator=(ClientConnection const& rhs); //memmove?
@@ -22,7 +22,7 @@ class ClientConnection
 
 		//accessor
 		int					getFD(void);
-		std::string			getRecvBuffer(void);
+		std::string			getRequestBuffer(void);
 };
 
 #endif //CLIENTCONNECTION_HPP
