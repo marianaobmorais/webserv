@@ -41,6 +41,24 @@ ssize_t	ClientConnection::recvData(void)
 	throw std::runtime_error("error: recv: " + errorMsg);
 }
 
+ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t toSend)
+{
+	if (_fd == -1)
+	{
+		throw std::runtime_error("error: recvData: fd == -1");
+	}
+
+	ssize_t	bytesSent;
+
+	bytesSent = send(client.getFD(), client.getResponseBuffer().c_str() + sent, toSend, 0);
+	if (bytesSent >= 0)
+		return (bytesSent);
+	if (errno == EAGAIN || errno == EWOULDBLOCK)
+		return (-1);
+	std::string	errorMsg(strerror(errno));
+	throw	std::runtime_error("error: send: " + errorMsg);
+}
+
 bool	ClientConnection::completedRequest(void) //TODO
 {
 	//GET
@@ -81,3 +99,9 @@ void		ClientConnection::setSentBytes(size_t bytes)
 {
 	this->_sentBytes = bytes;
 }
+
+void	ClientConnection::setResponseBuffer(std::string buffer)
+{
+	this->_responseBuffer = buffer;
+}
+
