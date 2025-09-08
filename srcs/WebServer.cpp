@@ -29,6 +29,7 @@ void	WebServer::queueClientConnections(void)
 		int	newClientFD = newFDs[j];
 		if (_clients.find(newClientFD) == _clients.end()) //avoid adding duplicates
 		{
+			std::cout << "queueClientConnections: fd: " << newFDs[j] << std::endl; //debug
 			//new client connection
 			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD)));
 
@@ -49,11 +50,18 @@ void	WebServer::receiveRequest(size_t i)
 		{
 			ssize_t	bytesRecv = client.recvData();
 
-			if (bytesRecv > 0 && client.completedRequest())
+			if (bytesRecv > 0 && client.completedRequest() /* request.getState() */)
 			{
 				std::cout << client.getRequestBuffer() << std::endl; //debug
 				//TODO : client.setResponseBuffer(HTTPresponse(client));
-				////client.clearBuffer(); //call _requestBuffer.clear()?
+				std::string response =
+					"HTTP/1.1 200 OK\r\n"
+					"Content-Type: text/plain\r\n"
+					"Content-Length: 12\r\n"
+					"\r\n"
+					"Hello World!"; //debug
+				client.setResponseBuffer(response);
+				client.clearBuffer(); //rename
 				this->_pollFDs[i].events = POLLOUT; //After receiving a full request, switch events to POLLOUT
 				client.setSentBytes(0);
 			}
@@ -72,6 +80,7 @@ void	WebServer::sendResponse(size_t i)
 {
 	std::map<int, ClientConnection>::iterator	it;
 	it = this->_clients.find(this->_pollFDs[i].fd);
+	std::cout << "Response: fd: " << this->_pollFDs[i].fd << std::endl; //debug
 	if (it != this->_clients.end()) //should I treat it in case of false?
 	{
 		ClientConnection	&client = it->second;
@@ -111,8 +120,8 @@ void	WebServer::sendResponse(size_t i)
 
 void	WebServer::removeClientConnection(int clientFD, size_t pollFDIndex)
 {
-	std::cout << "Closing client fd=" << clientFD << std::endl;
-	std::cout << "removing client connection..." << std::endl;
+	// std::cout << "Closing client fd=" << clientFD << std::endl;
+	// std::cout << "removing client connection..." << std::endl; //debug
 	this->_clients.erase(clientFD); //erase by key // the clientConnection destructor already handles close the fd -> RAII
 	this->_pollFDs.erase(_pollFDs.begin() + pollFDIndex); //erase by iterator position
 }
@@ -170,6 +179,7 @@ void	WebServer::runServer(void)
 				this->sendResponse(i);
 			else if (this->_pollFDs[i].revents & (POLLERR | POLLHUP)) //POLLNVAL?
 			{
+				std::cout << "removing client..." << std::endl;
 				std::map<int, ClientConnection>::iterator	it;
 				it = this->_clients.find(this->_pollFDs[i].fd);
 				if (it != this->_clients.end())
