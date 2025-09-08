@@ -74,6 +74,11 @@ bool	ClientConnection::completedRequest(void) //TODO
 	return (false);
 }
 
+void	ClientConnection::clearBuffer(void) //rename
+{
+	this->_requestBuffer.clear();
+}
+
 
 int const&	ClientConnection::getFD(void) const
 {

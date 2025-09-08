@@ -13,6 +13,8 @@ class ClientConnection
 		std::string			_responseBuffer;
 		size_t				_sentBytes;
 		//time_t				_lastActive;
+		//httpresquet
+		//httpresponse
 
 		ClientConnection&	operator=(ClientConnection const& rhs); //memmove?
 	public:
@@ -23,6 +25,7 @@ class ClientConnection
 		ssize_t				recvData(void);
 		ssize_t				sendData(ClientConnection &client, size_t sent, size_t toSend);
 		bool				completedRequest(void);
+		void				clearBuffer(void);
 
 		//accessors
 		int const&			getFD(void) const;
