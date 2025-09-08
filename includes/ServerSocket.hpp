@@ -22,7 +22,7 @@ class ServerSocket
 		//std::vector<ClientConnection>	acceptConnections(void); //accepts clients, producing a vector of ClientConnection
 
 		//accesor
-		int					getFD(void);
+		int const&			getFD(void) const;
 };
 
 #endif //SERVERSOCKET_HPP

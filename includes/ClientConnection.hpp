@@ -7,8 +7,9 @@ class ClientConnection
 {
 	private:
 		int					_fd;
-		std::string			_recvBuffer;
-		std::string			_sendBuffer;
+		std::string			_requestBuffer;
+		std::string			_responseBuffer;
+		size_t				_sentBytes;
 		//time_t				_lastActive;
 
 		ClientConnection&	operator=(ClientConnection const& rhs); //memmove?
@@ -21,8 +22,11 @@ class ClientConnection
 		bool				completedRequest(void);
 
 		//accessor
-		int					getFD(void);
-		std::string			getRecvBuffer(void);
+		int const&			getFD(void) const;
+		std::string const&	getRequestBuffer(void) const;
+		std::string const&	getResponseBuffer(void) const;
+		size_t const&		getSentBytes(void) const;
+		void				setSentBytes(size_t bytes);
 };
 
 #endif //CLIENTCONNECTION_HPP

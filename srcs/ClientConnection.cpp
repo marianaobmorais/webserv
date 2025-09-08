@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <string>
 
-ClientConnection::ClientConnection(int fd) : _fd(fd) {}
+ClientConnection::ClientConnection(int fd) : _fd(fd), _sentBytes(0) {}
 
 ClientConnection::ClientConnection(ClientConnection const& src) : _fd(src._fd) {}
 
@@ -30,7 +30,7 @@ ssize_t	ClientConnection::recvData(void)
 	bytesRecv = ::recv(this->_fd, buffer, sizeof(buffer), 0);
 	if (bytesRecv > 0)
 	{
-		_recvBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
+		_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
 		return (bytesRecv);
 	}
 	if (bytesRecv == 0)
@@ -44,7 +44,7 @@ ssize_t	ClientConnection::recvData(void)
 bool	ClientConnection::completedRequest(void)
 {
 	//GET
-	if (_recvBuffer.find("\r\n\r\n") != std::string::npos)
+	if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
 		return (true);
 
 	//POST
@@ -57,12 +57,28 @@ bool	ClientConnection::completedRequest(void)
 }
 
 
-int	ClientConnection::getFD(void)
+int const&	ClientConnection::getFD(void) const
 {
 	return (this->_fd);
 }
 
-std::string	ClientConnection::getRecvBuffer(void)
+std::string const&	ClientConnection::getRequestBuffer(void) const
 {
-	return (_recvBuffer);
+	return (this->_requestBuffer);
 }
+
+std::string const&	ClientConnection::getResponseBuffer(void) const
+{
+	return (this->_responseBuffer);
+}
+
+size_t const&	ClientConnection::getSentBytes(void) const
+{
+	return (this->_sentBytes);
+}
+
+void	ClientConnection::setSentBytes(size_t bytes)
+{
+	this->_sentBytes = bytes;
+}
+

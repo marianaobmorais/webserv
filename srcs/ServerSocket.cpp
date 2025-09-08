@@ -129,7 +129,7 @@ std::vector<int>	ServerSocket::acceptConnections(void)
 	return (newFDs);
 }
 
-int	ServerSocket::getFD(void)
+int const&	ServerSocket::getFD(void) const
 {
 	return (this->_fd);
 }
