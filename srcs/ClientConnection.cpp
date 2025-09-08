@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <string>
 
-ClientConnection::ClientConnection(int fd) : _fd(fd) {}
+ClientConnection::ClientConnection(int fd) : _fd(fd), _sentBytes(0) {}
 
 ClientConnection::ClientConnection(ClientConnection const& src) : _fd(src._fd) {}
 
@@ -41,7 +41,7 @@ ssize_t	ClientConnection::recvData(void)
 	throw std::runtime_error("error: recv: " + errorMsg);
 }
 
-bool	ClientConnection::completedRequest(void)
+bool	ClientConnection::completedRequest(void) //TODO
 {
 	//GET
 	if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
@@ -57,12 +57,27 @@ bool	ClientConnection::completedRequest(void)
 }
 
 
-int	ClientConnection::getFD(void)
+int const&	ClientConnection::getFD(void) const
 {
 	return (this->_fd);
 }
 
-std::string	ClientConnection::getRequestBuffer(void)
+size_t const&	ClientConnection::getSentBytes(void) const
+{
+	return (this->_sentBytes);
+}
+
+std::string const&	ClientConnection::getRequestBuffer(void) const
 {
 	return (_requestBuffer);
+}
+
+std::string const&	ClientConnection::getResponseBuffer(void) const
+{
+	return (_responseBuffer);
+}
+
+void		ClientConnection::setSentBytes(size_t bytes)
+{
+	this->_sentBytes = bytes;
 }
