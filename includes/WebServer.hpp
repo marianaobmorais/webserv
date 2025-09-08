@@ -25,7 +25,7 @@ class WebServer
 		void							runServer(void); //run loop
 		void							queueClientConnections(void);
 		void							addToPollFD(int fd, short events);
-		bool							receiveRequest(size_t i);
+		void							receiveRequest(size_t i);
 		void							removeClientConnection(int clientFD, size_t poolFDIndex);
 		//later
 		//void							stop(void); //cleanup

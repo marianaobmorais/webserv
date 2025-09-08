@@ -24,6 +24,8 @@ void	WebServer::startServer(void)
 //HELPER FUNCTION
 static int	getPollTimeout(bool CGI) //refactor later
 {
+	//time_t	now = time(NULL); //to compare with CGI start time
+
 	if (!CGI)
 		return (-1); //no timeout
 	else
@@ -37,32 +39,27 @@ void	WebServer::runServer(void)
 	{
 		int timeout = getPollTimeout(false); //update poll() timeout parameter accordingly to the presence of CGI process
 		int	ready = ::poll(&this->_pollFDs[0], this->_pollFDs.size(), timeout);
-		//time_t	now = time(NULL); //to compare with CGI start time
 
 		if (ready == -1) //error
 		{
-			// if (errno == EINTR) //"harmless/temporary error"?
-			// 	continue ;
+			if (errno == EINTR) //"harmless/temporary error"?
+				continue ;
 			std::string	errorMsg(strerror(errno));
 			throw std::runtime_error("error: poll: " + errorMsg);
 		}
 		if (ready == 0) //poll timed out
 		{
-			//TODO //Check how long each CGI process has been running, remove zombie processes
+			; //TODO //Check how long each CGI process has been running, remove zombie processes
 		}
 
-		const size_t	readySize = this->_pollFDs.size();
-		for (size_t i = 0; i < readySize; i++)  // Loop through all poll monitored FDs
+		for (ssize_t i = static_cast<ssize_t>(this->_pollFDs.size()) - 1; i >= 0 ; i--)  // Loop through all poll monitored FDs
 		{
 			if (this->_pollFDs[i].revents & POLLIN) //check if POLLIN bit is set, regardless of what other bits may also be set
 			{
 				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
 					this->queueClientConnections();
 				else //If it wasn’t the server socket, then it must be one of the client sockets
-				{
-					if (!this->receiveRequest(i))
-						i--;
-				}
+					this->receiveRequest(i);
 			}
 			else
 			{
@@ -92,7 +89,7 @@ void	WebServer::queueClientConnections(void)
 	}
 }
 
-bool	WebServer::receiveRequest(size_t i)
+void	WebServer::receiveRequest(size_t i)
 {
 	std::map<int, ClientConnection>::iterator	it;
 	it = this->_clients.find(_pollFDs[i].fd);
@@ -106,23 +103,17 @@ bool	WebServer::receiveRequest(size_t i)
 			if (bytesRecv > 0)
 			{
 				if (client.completedRequest())
-					std::cout << client.getRecvBuffer() << std::endl; //TODO
+					std::cout << client.getRequestBuffer() << std::endl; //TODO
 			}
 			else if (bytesRecv == 0)
-			{
 				this->removeClientConnection(client.getFD(), i);
-				return (false);
-			}
 		}
 		catch (std::exception const& e)
 		{
 			std::cerr << "error: " << e.what() << '\n';
 			this->removeClientConnection(client.getFD(), i);
-			return (false);
 		}
-		return (true);
 	}
-	return (false);
 }
 
 void	WebServer::removeClientConnection(int clientFD, size_t poolFDIndex)
