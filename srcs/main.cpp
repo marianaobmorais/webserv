@@ -4,23 +4,28 @@
 
 int	main(void)
 {
-	std::string	clientRequest = 
-	"POST /api/login HTTP/1.1\r\n"
-	"Host: localhost:8000\r\n"
-	"Content-Type: application/json\r\n"
-	"Content-Length: 49\r\n"
-	"Connection: close\r\n"
-	"\r\n"
-	"{\r\n"
-	"  \"username\": \"alice\",\r\n"
-	"  \"password\": \"12345\"\r\n"
-	"}\r\n";
+	std::string clientRequest =
+		"POST /api/login HTTP/1.1\r\n"
+		"Host: localhost:8000\r\n"
+		"Content-Type: application/json\r\n"
+		"Content-Length: 49\r\n"
+		"Connection: close\r\n"
+		"\r\n"
+		"{\r\n"
+		"  \"username\": \"alice\",\r\n"
+		"  \"password\": \"12345\"\r\n"
+		"}\r\n";
 
 	HttpRequest request;
-	RequestParse::handleRawRequest(clientRequest, request);
+
+	for (std::size_t i = 0; i < clientRequest.size(); ++i)
+	{
+		std::string chunk = clientRequest.substr(i, 1); // 1 byte por vez
+		RequestParse::handleRawRequest(chunk, request);
+	}
 
 	if (request.getParseError() != RequestParseError::OK)
-		std::cout << "Error!" << std::endl;\
+		std::cout << "Error: " << request.getParseError() << std::endl;\
 	else
 	{
 		std::cout << "Method: " << request.getMethod() << std::endl;
