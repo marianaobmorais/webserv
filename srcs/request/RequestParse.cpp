@@ -11,35 +11,49 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 	request.appendRaw(chunk);
 	std::string& rawRequest = request.getRaw();
 
-	std::string buffer;
+	std::string& buffer = request.getBuffer();
 	std::size_t i = 0;
 
 	while (i < rawRequest.size())
 	{
-		if (i + 1 < rawRequest.size() && rawRequest[i] == '\r' && rawRequest[i + 1] == '\n')
-		{
-			if (request.getState() == RequestState::RequestLine)
-			{
-				requestLine(buffer, request);
-				request.setRequestState(RequestState::Headers);
-			}
-			else if (request.getState() == RequestState::Headers)
-			{
-				if (buffer.empty())
-					request.setRequestState(RequestState::Body);
-				else
-				{
-					headers(buffer, request);
-				}
-			}
-			buffer.clear();
-			i += 2;
-			continue ;
-		}
 		if (request.getState() < RequestState::Body)
 		{
-			buffer.push_back(rawRequest[i]);
+			char ch = rawRequest[i];
+			if (ch == '\r')
+			{
+				if (i + 1 >= rawRequest.size())
+					break ;
+				if (rawRequest[i + 1] != '\n')
+				{
+					request.setParseError(RequestParseError::InvalidHeader);
+					return ;
+				}
+				if (request.getState() == RequestState::RequestLine)
+				{
+					if (!buffer.empty())
+						requestLine(buffer, request);
+					request.setRequestState(RequestState::Headers);
+				}
+				else
+				{
+					if (buffer.empty())
+					{
+						request.setRequestState(RequestState::Body);
+						i += 2;
+						break ;
+					}
+					else
+					{
+						headers(buffer, request);
+					}
+				}
+				request.clearBuffer();
+				i += 2;
+				continue ;
+			}
+			buffer.push_back(ch);
 			++i;
+			continue ;
 		}
 		else
 		{
@@ -47,7 +61,8 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 			++i;
 		}
 	}
-	request.getRaw().erase(0, i);
+	if (i > 0)
+		request.getRaw().erase(0, i);
 }
 
 void	RequestParse::requestLine(const std::string& buffer, HttpRequest& request)
@@ -144,5 +159,9 @@ void	RequestParse::body(char c, HttpRequest& request)
 		request.appendBody(c);
 		if ((int) request.getBody().size() >= request.getMeta().getContentLength())
 			request.setRequestState(RequestState::Complete);
+	}
+	else
+	{
+
 	}
 }

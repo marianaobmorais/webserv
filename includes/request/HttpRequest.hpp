@@ -25,6 +25,7 @@ class HttpRequest
 		RequestParseError::reason			_parseError;
 		RequestState::state					_state;
 		std::string							_rawRequest;
+		std::string							_buffer;
 
 	public:
 		HttpRequest();
@@ -43,6 +44,7 @@ class HttpRequest
 		void	addHeader(const std::string& name, const std::string& value);
 		void	setRequestState(RequestState::state state);
 		void	appendRaw(const std::string& chunk);
+		void	clearBuffer(void);
 
 		//getters
 		RequestMethod::Method		getMethod(void) const;
@@ -55,6 +57,7 @@ class HttpRequest
 		const std::string&			getHeader(const std::string& name) const;
 		RequestState::state			getState(void) const;
 		std::string&				getRaw(void);
+		std::string&				getBuffer(void);
 };
 
 #endif //HTTP_REQUEST_HPP

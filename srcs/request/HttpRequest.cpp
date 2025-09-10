@@ -65,6 +65,11 @@ void	HttpRequest::appendRaw(const std::string& chunk)
 	this->_rawRequest += chunk;
 }
 
+void	HttpRequest::clearBuffer(void)
+{
+	this->_buffer.clear();
+}
+
 RequestMethod::Method	HttpRequest::getMethod(void) const
 {
 	return (this->_method);
@@ -116,4 +121,9 @@ RequestState::state	HttpRequest::getState(void) const
 std::string&	HttpRequest::getRaw(void)
 {
 	return (this->_rawRequest);
+}
+
+std::string&	HttpRequest::getBuffer(void)
+{
+	return (this->_buffer);
 }
