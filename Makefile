@@ -1,8 +1,9 @@
 NAME = webserv
 
-SRCS = srcs/*
+SRCS = srcs/main.cpp \
+		srcs/utils/Logger.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+# OBJS = $(SRCS:.cpp=.o)
 
 CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98
@@ -10,12 +11,12 @@ CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 RM = rm -f
 
 $(NAME): $(OBJS)
-		$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+		$(CXX) $(CXXFLAGS) $(OBJS) -DDEV=1 -I./includes $(SRCS) -o $(NAME)
 
 all: $(NAME)
 
-%.o: %.cpp
-		$(CXX) $(CXXFLAGS) -c $< -o $@
+# %.o: %.cpp
+# 		$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 		$(RM) $(OBJS)
