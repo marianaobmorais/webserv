@@ -2,7 +2,7 @@
 
 Logger::Logger(const std::string& filename)
 {
-	_logFile.open(filename, std::ios::app);
+	_logFile.open(filename.c_str(), std::ios::app);
 	if (!_logFile.is_open())
 	{
 		std::cerr << "Error opening log file." << std::endl;
@@ -32,7 +32,7 @@ void	Logger::log(LogLevel level, const std::string& message)
 	}
 }
 
-const std::string	levelToString(LogLevel level)
+const std::string	Logger::levelToString(LogLevel level) const
 {
 	switch (level)
 	{
