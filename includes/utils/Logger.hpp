@@ -1,5 +1,9 @@
 #ifndef LOGGER_HPP
-#define LOGGER_HPP
+# define LOGGER_HPP
+
+#ifndef DEV
+# define DEV 0
+#endif //DEV
 
 #include <ctime>
 #include <fstream>
@@ -22,10 +26,12 @@ class Logger
 
 		const std::string	levelToString(LogLevel level) const;
 
-	public:
-		Logger(const std::string& filename);
+		Logger();
 		~Logger();
 
+
+	public:
+		static Logger&	instance();
 		void	log(LogLevel level, const std::string& message);
 };
 

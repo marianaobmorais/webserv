@@ -11,7 +11,7 @@ CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 RM = rm -f
 
 $(NAME): $(OBJS)
-		$(CXX) $(CXXFLAGS) $(OBJS) -I./includes $(SRCS) -o $(NAME)
+		$(CXX) $(CXXFLAGS) $(OBJS) -DDEV=1 -I./includes $(SRCS) -o $(NAME)
 
 all: $(NAME)
 

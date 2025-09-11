@@ -2,12 +2,9 @@
 
 int	main()
 {
-	Logger logger("logfile.txt"); // Create logger instance
-
-	// Example usage of the logger
-	logger.log(INFO, "Program started.");
-	logger.log(DEBUG, "Debugging information.");
-	logger.log(ERROR, "An error occurred.");
+	Logger::instance().log(INFO, "Program started.");
+	Logger::instance().log(DEBUG, "Debugging information.");
+	Logger::instance().log(ERROR, "An error occurred.");
 
 	return 0;
 }
