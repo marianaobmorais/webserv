@@ -1,17 +1,21 @@
 NAME = webserv
 
 REQUEST_PATH = srcs/request
+RESPONSE_PATH = srcs/response
+UTILS_PATH = srcs/utils
 
 SRCS = srcs/main.cpp \
-  srcs/utils/Logger.cpp
 	$(REQUEST_PATH)/HttpRequest.cpp \
-	$(REQUEST_PATH)/RequestMeta.cpp  \
-	$(REQUEST_PATH)/RequestParse.cpp
+	$(REQUEST_PATH)/RequestMeta.cpp \
+	$(REQUEST_PATH)/RequestParse.cpp \
+	$(RESPONSE_PATH)/HttpResponse.cpp \
+	$(RESPONSE_PATH)/ResponseBuilder.cpp \
+	$(UTILS_PATH)/Logger.cpp
 
 #OBJS = $(SRCS:.cpp=.o)
 
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g
 
 RM = rm -f
 
