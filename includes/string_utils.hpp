@@ -2,6 +2,7 @@
 #define STRING_UTILS_HPP
 
 #include <string>
+#include <sstream>
 #include <vector>
 #include <algorithm>
 #include <cctype>
@@ -63,14 +64,15 @@ inline std::vector<std::string>	split(const std::string& str, const std::string&
 	return (tokens);
 }
 
-inline long	stringToHex(const std::string& str)
+inline int	stringToHex(const std::string& str)
 {
-	char *end;
-	long value = std::strtol(str.c_str(), &end, 16);
-	if (*end == '\0')
-		return (value);
-	else
+	std::istringstream iss(str);
+	int value;
+
+	iss >> std::hex >> value;
+	if (iss.fail() || !iss.eof())
 		return (-1);
+	return (value);
 }
 
 #endif //STRING_UTILS_HPP
