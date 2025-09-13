@@ -63,4 +63,14 @@ inline std::vector<std::string>	split(const std::string& str, const std::string&
 	return (tokens);
 }
 
+inline long	stringToHex(const std::string& str)
+{
+	char *end;
+	long value = std::strtol(str.c_str(), &end, 16);
+	if (*end == '\0')
+		return (value);
+	else
+		return (-1);
+}
+
 #endif //STRING_UTILS_HPP
