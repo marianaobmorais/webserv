@@ -59,7 +59,7 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 			++i;
 			continue ;
 		}
-		else
+		if (request.getState() == RequestState::Body)
 		{
 			body(rawRequest[i], request);
 			++i;
@@ -203,10 +203,11 @@ void	RequestParse::bodyChunked(char c, HttpRequest& request)
 		{
 
 			int size = stringToHex(buffer.substr(0, buffer.size() - 2));
+			std::cout << "size: " <<  size << std::endl;
 			request.clearBuffer();
 			if (size < 0)
 			{
-				request.setParseError(RequestParseError::InvalidHeader); //invalid body
+				request.setParseError(RequestParseError::BadRequestLine);
 				request.setRequestState(RequestState::Complete);
 				return ;
 			}
