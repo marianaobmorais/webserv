@@ -1,9 +1,14 @@
 NAME = webserv
 
-SRCS = srcs/main.cpp \
-		srcs/utils/Logger.cpp
+REQUEST_PATH = srcs/request
 
-# OBJS = $(SRCS:.cpp=.o)
+SRCS = srcs/main.cpp \
+  srcs/utils/Logger.cpp
+	$(REQUEST_PATH)/HttpRequest.cpp \
+	$(REQUEST_PATH)/RequestMeta.cpp  \
+	$(REQUEST_PATH)/RequestParse.cpp
+
+#OBJS = $(SRCS:.cpp=.o)
 
 CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98
