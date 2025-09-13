@@ -14,6 +14,9 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 	std::string& buffer = request.getBuffer();
 	std::size_t i = 0;
 
+	if (request.getState() == RequestState::Complete)
+		return ;
+
 	while (i < rawRequest.size())
 	{
 		if (request.getState() < RequestState::Body)
@@ -39,6 +42,7 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 					if (buffer.empty())
 					{
 						request.setRequestState(RequestState::Body);
+						request.clearBuffer();
 						i += 2;
 						break ;
 					}
@@ -162,6 +166,67 @@ void	RequestParse::body(char c, HttpRequest& request)
 	}
 	else
 	{
+		bodyChunked(c, request);
+	}
+}
 
+void	RequestParse::bodyChunked(char c, HttpRequest& request)
+{
+	std::string& buffer = request.getBuffer();
+	std::string& chunkBuffer = request.getChunkBuffer();
+
+	if (request.isExpectingChunkSeparator())
+	{
+		buffer.push_back(c);
+		if (buffer.size() >= 2 &&
+			buffer[buffer.size() - 2] == '\r' &&
+			buffer[buffer.size() - 1] == '\n')
+		{
+			request.clearBuffer();
+			request.setExpectingChunkSeparator(false);
+			request.setParsingChunkSize(true);
+		}
+		else if (buffer.size() > 2)
+		{
+			request.setParseError(RequestParseError::InvalidHeader);
+			request.setRequestState(RequestState::Complete);
+		}
+		return ;
+	}
+	if (request.isParsingChunkSize())
+	{
+		buffer.push_back(c);
+
+		if (buffer.size() >= 2 &&
+			buffer[buffer.size() - 2] == '\r' &&
+			buffer[buffer.size() - 1] == '\n')
+		{
+
+			int size = stringToHex(buffer.substr(0, buffer.size() - 2));
+			request.clearBuffer();
+			if (size < 0)
+			{
+				request.setParseError(RequestParseError::InvalidHeader); //invalid body
+				request.setRequestState(RequestState::Complete);
+				return ;
+			}
+			if (size == 0)
+			{
+				request.setRequestState(RequestState::Complete);
+				return ;
+			}
+			request.setCurrentChunkSize(size);
+			request.setParsingChunkSize(false);
+		}
+		return ;
+	}
+
+	chunkBuffer.push_back(c);
+
+	if ( (int) chunkBuffer.size() == request.getCurrentChunkSize())
+	{
+		request.appendBody(chunkBuffer);
+		request.clearChunkBuffer();
+		request.setExpectingChunkSeparator(true);
 	}
 }

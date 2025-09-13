@@ -17,6 +17,7 @@ class RequestParse
 		static void	method(const std::string& method, HttpRequest& request);
 		static void	headers(const std::string& header, HttpRequest& request);
 		static void	body(char c, HttpRequest& request);
+		static void	bodyChunked(char c, HttpRequest& request);
 
 	public:
 		static void	handleRawRequest(const std::string& rawRequest, HttpRequest& request);
