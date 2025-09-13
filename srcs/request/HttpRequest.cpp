@@ -9,6 +9,9 @@ HttpRequest::HttpRequest()
 	getMeta().setConnectionClose(false);
 	getMeta().setExpectContinue(false);
 	setRequestState(RequestState::RequestLine);
+	setParsingChunkSize(true);
+	setExpectingChunkSeparator(false);
+	setCurrentChunkSize(0);
 }
 
 HttpRequest::~HttpRequest() {}
@@ -70,6 +73,26 @@ void	HttpRequest::clearBuffer(void)
 	this->_buffer.clear();
 }
 
+void	HttpRequest::clearChunkBuffer(void)
+{
+	this->_chunkBuffer.clear();
+}
+
+void	HttpRequest::setCurrentChunkSize(int size)
+{
+	this->_currentChunkSize = size;
+}
+
+void	HttpRequest::setParsingChunkSize(bool value)
+{
+	this->_parsingChunkSize = value;
+}
+
+void	HttpRequest::setExpectingChunkSeparator(bool value)
+{
+	this->_expectingChunkSeparator = value;
+}
+
 RequestMethod::Method	HttpRequest::getMethod(void) const
 {
 	return (this->_method);
@@ -126,4 +149,24 @@ std::string&	HttpRequest::getRaw(void)
 std::string&	HttpRequest::getBuffer(void)
 {
 	return (this->_buffer);
+}
+
+std::string&	HttpRequest::getChunkBuffer(void)
+{
+	return (this->_chunkBuffer);
+}
+
+int	HttpRequest::getCurrentChunkSize(void) const
+{
+	return (this->_currentChunkSize);
+}
+
+bool	HttpRequest::isParsingChunkSize(void) const
+{
+	return (this->_parsingChunkSize);
+}
+
+bool	HttpRequest::isExpectingChunkSeparator(void) const
+{
+	return (this->_expectingChunkSeparator);
 }

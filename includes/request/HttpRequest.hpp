@@ -26,6 +26,10 @@ class HttpRequest
 		RequestState::state					_state;
 		std::string							_rawRequest;
 		std::string							_buffer;
+		std::string							_chunkBuffer;
+		int									_currentChunkSize;
+		bool								_parsingChunkSize;
+		bool								_expectingChunkSeparator;
 
 	public:
 		HttpRequest();
@@ -45,6 +49,10 @@ class HttpRequest
 		void	setRequestState(RequestState::state state);
 		void	appendRaw(const std::string& chunk);
 		void	clearBuffer(void);
+		void	clearChunkBuffer(void);
+		void	setCurrentChunkSize(int size);
+		void	setParsingChunkSize(bool value);
+		void	setExpectingChunkSeparator(bool value);
 
 		//getters
 		RequestMethod::Method		getMethod(void) const;
@@ -58,6 +66,10 @@ class HttpRequest
 		RequestState::state			getState(void) const;
 		std::string&				getRaw(void);
 		std::string&				getBuffer(void);
+		std::string&				getChunkBuffer(void);
+		int							getCurrentChunkSize(void) const;
+		bool						isParsingChunkSize() const;
+		bool						isExpectingChunkSeparator() const;
 };
 
 #endif //HTTP_REQUEST_HPP
