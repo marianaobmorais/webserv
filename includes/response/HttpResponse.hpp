@@ -12,8 +12,8 @@ class HttpResponse
 {
 	private:
 		ResponseStatus::code				_statusCode;
-		const std::string&					_reasonPhrase;
-		const std::string&					_version;
+		std::string							_reasonPhrase;
+		std::string							_version;
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 		bool								_chunked; // transfer encoding
@@ -21,12 +21,16 @@ class HttpResponse
 		HttpResponse& operator=(const HttpResponse& rhs);
 		HttpResponse(const HttpResponse& rhs);
 
+		const std::string	statusCodeToString(const ResponseStatus::code& code);
+
 	public:
 		HttpResponse();
 		~HttpResponse();
 
 		//setters
 		void	setStatusCode(const ResponseStatus::code& code);
+		void	setReasonPhrase(const ResponseStatus::code& code);
+		void	setVersion(const std::string& version);
 		void	appendBody(const std::string& body);
 		void	appendBody(char c);
 		void	addHeader(const std::string& name, const std::string& value);
@@ -34,9 +38,11 @@ class HttpResponse
 
 		//getters
 		ResponseStatus::code		getStatusCode(void) const;
+		const std::string&			getReasonPhrase(void) const;
 		const std::string&			getHttpVersion(void) const;
 		const std::string&			getBody(void) const;
 		const std::string&			getHeader(const std::string& name) const;
+		std::map<std::string, std::string>&	getHeaders(void) const;
 		bool						isChunked(void) const;
 };
 
