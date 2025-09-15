@@ -81,7 +81,7 @@ const std::string& HttpResponse::getHeader(const std::string& name) const
 	return (name);
 }
 
-std::map<std::string, std::string>&	HttpResponse::getHeaders(void) const
+const std::map<std::string, std::string>&	HttpResponse::getHeaders(void) const
 {
 	return (this->_headers);
 }

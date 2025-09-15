@@ -42,7 +42,7 @@ class HttpResponse
 		const std::string&			getHttpVersion(void) const;
 		const std::string&			getBody(void) const;
 		const std::string&			getHeader(const std::string& name) const;
-		std::map<std::string, std::string>&	getHeaders(void) const;
+		const std::map<std::string, std::string>&	getHeaders(void) const;
 		bool						isChunked(void) const;
 };
 
