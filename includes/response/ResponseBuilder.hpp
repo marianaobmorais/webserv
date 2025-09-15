@@ -3,6 +3,7 @@
 
 //webserv
 #include <response/HttpResponse.hpp>
+#include <response/ResponseStatus.hpp>
 
 class ResponseBuilder
 {
@@ -12,8 +13,15 @@ class ResponseBuilder
 		ResponseBuilder(const ResponseBuilder& rhs); //blocked
 		ResponseBuilder& operator=(const ResponseBuilder& rhs); //blocked
 
+		static const std::string	fmtTimestamp(void);
+		static void					setMinimumHeaders(HttpResponse& response);
+		static std::string			errorPageGenerator(ResponseStatus::code code);
+
 	public:
 		static const std::string	responseToString(HttpResponse& response);
+		static void					run(HttpResponse& response /* config */);
+		//static void				cgi();
+		//static void				staticPage();
 };
 
 #endif //RESPONSE_BUILDER_HPP
