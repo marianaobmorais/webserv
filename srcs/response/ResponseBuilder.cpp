@@ -1,6 +1,7 @@
 #include <sstream>
 #include <response/ResponseBuilder.hpp>
 #include <utils/Logger.hpp>
+#include <utils/string_utils.hpp>
 
 const std::string	ResponseBuilder::fmtTimestamp(void)
 {
@@ -42,8 +43,6 @@ const std::string	ResponseBuilder::responseToString(HttpResponse& response)
 
 	Logger::instance().log(DEBUG, "[Started] ResponseBuilder::responseToString");
 
-	setMinimumHeaders(response);// remove
-
 	//response line
 	oss << "HTTP/" << response.getHttpVersion() << " "
 		<< response.getStatusCode() << " "
@@ -68,7 +67,57 @@ const std::string	ResponseBuilder::responseToString(HttpResponse& response)
 	return (oss.str());
 }
 
-void	ResponseBuilder::run(HttpResponse& response /* request */ /* config */)
+void	ResponseBuilder::handleStaticPage(HttpResponse& response,
+			const std::string& output, const std::string& mimeType)
+{
+	response.setChunked(false);
+	response.addHeader("Content-Type", mimeType);
+	response.addHeader("Content-Length", toString(output.size()));
+	response.appendBody(output);
+}
+
+void	ResponseBuilder::handleCgiOutput(HttpResponse& response, const std::string& output)
+{
+	std::size_t sep = output.find("\r\n\r\n");
+	if (sep == std::string::npos)
+	{
+		response.setStatusCode(ResponseStatus::BadGateway);
+		return ;
+	}
+
+	std::string headersPart = output.substr(0, sep);
+	std::string bodyPart = output.substr(sep + 4);
+
+	std::istringstream headerStream(headersPart);
+	std::string line;
+
+	while (std::getline(headerStream, line))
+	{
+		if (!line.empty() && line[line.size() - 1] == '\r')
+			line = line.substr(0, line.size() - 1);
+
+		std::size_t colon = line.find(":");
+		if (colon != std::string::npos)
+		{
+			std::string key = trim(line.substr(0, colon));
+			std::string value = trim(line.substr(colon + 1));
+			response.addHeader(key, value);
+
+			if (toLower(key) == "status")
+			{
+				std::istringstream iss(value);
+				int status;
+				if (iss >> status)
+					response.setStatusCode(static_cast<ResponseStatus::code>(status));
+			}
+		}
+	}
+
+	response.appendBody(bodyPart);
+	response.addHeader("Content-Length", toString(bodyPart.size()));
+}
+
+void	ResponseBuilder::run(HttpResponse& response, const std::string& output /* request */ /* config */)
 {
 	Logger::instance().log(DEBUG, "[Started] ResponseBuilder::run");
 
@@ -83,25 +132,22 @@ void	ResponseBuilder::run(HttpResponse& response /* request */ /* config */)
 		{
 			const std::string& path = "path"; //config
 
-			//if readfile(path, content)
-			{
-				response.setChunked(false);
-				//response.addHeader("Content-Type", mimeType(path));
-				//response.addHeader("Content-Length", to_string(content.size()));
-				response.appendBody(content);
-			}
+			// if readfile(path, content)
+			// {
+			// 	staticPage(response, content, mimeType(path));
+			// }
 		}
 		else
 		{
 			content = errorPageGenerator(response.getStatusCode());
-			response.setChunked(false);
-			response.addHeader("Content-Type", "text/html");
-			//response.addHeader("Content-Length", to_string(content.size()));
-			response.appendBody(content);
+			handleStaticPage(response, content, "text/html");
 		}
 	}
 
-	//body cgi static page
+	// if (StaticPage)
+	handleStaticPage(response, output, "text/html" /* mimeType(path) */);
+	// if (CGI)
+	// 	handleCgiOutput(response, output);
 
 	Logger::instance().log(DEBUG, "[Finished] ResponseBuilder::run");
 }

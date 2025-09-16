@@ -49,7 +49,7 @@ int	main(void)
 
 	response.setStatusCode(ResponseStatus::NotFound);
 
-	ResponseBuilder::run(response);
+	ResponseBuilder::run(response, "output");
 
 	std::cout << ResponseBuilder::responseToString(response);
 

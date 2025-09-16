@@ -16,12 +16,14 @@ class ResponseBuilder
 		static const std::string	fmtTimestamp(void);
 		static void					setMinimumHeaders(HttpResponse& response);
 		static std::string			errorPageGenerator(ResponseStatus::code code);
+		static void					handleStaticPage(HttpResponse& response,
+										const std::string& output,
+										const std::string& mimeType);
+		static void					handleCgiOutput(HttpResponse& response, const std::string& output);
 
 	public:
 		static const std::string	responseToString(HttpResponse& response);
-		static void					run(HttpResponse& response /* config */);
-		//static void				cgi();
-		//static void				staticPage();
+		static void					run(HttpResponse& response, const std::string& output /* config */);
 };
 
 #endif //RESPONSE_BUILDER_HPP
