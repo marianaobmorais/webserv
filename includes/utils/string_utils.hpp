@@ -75,4 +75,12 @@ inline int	stringToHex(const std::string& str)
 	return (value);
 }
 
+template <typename T>
+inline std::string	toString(T value)
+{
+	std::ostringstream oss;
+	oss << value;
+	return oss.str();
+}
+
 #endif //STRING_UTILS_HPP
