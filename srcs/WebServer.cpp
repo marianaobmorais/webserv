@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <iostream>
 
-WebServer::WebServer(void) : _serverSocket() {}
+WebServer::WebServer(Config const& config) : _config(config), _serverSocket() {}
 
 WebServer::~WebServer(void){}
 
