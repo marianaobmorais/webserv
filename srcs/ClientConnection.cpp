@@ -35,8 +35,6 @@ ssize_t	ClientConnection::recvData(void)
 	}
 	if (bytesRecv == 0)
 		return (0);
-	if (errno == EAGAIN || errno == EWOULDBLOCK)
-		return (-1);
 	std::string	errorMsg(strerror(errno));
 	throw std::runtime_error("error: recv: " + errorMsg);
 }
@@ -53,8 +51,6 @@ ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t
 	bytesSent = send(client.getFD(), client.getResponseBuffer().c_str() + sent, toSend, 0);
 	if (bytesSent >= 0)
 		return (bytesSent);
-	if (errno == EAGAIN || errno == EWOULDBLOCK)
-		return (-1);
 	std::string	errorMsg(strerror(errno));
 	throw	std::runtime_error("error: send: " + errorMsg);
 }
