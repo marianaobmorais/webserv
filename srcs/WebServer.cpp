@@ -151,6 +151,7 @@ void	WebServer::runServer(void)
 {
 	while (true)
 	{
+		//subject: A request to your server should never hang indefinitely
 		int timeout = getPollTimeout(false); //update poll() timeout parameter accordingly to the presence of CGI process
 		int	ready = ::poll(&this->_pollFDs[0], this->_pollFDs.size(), timeout);
 
