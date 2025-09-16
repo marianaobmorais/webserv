@@ -1,5 +1,5 @@
 #include "Config.hpp"
 
-Config::Config(std::string file) : _file(file) {}
+Config::Config(std::string filePath) : _path(filePath) {}
 
 Config::~Config(void) {}
