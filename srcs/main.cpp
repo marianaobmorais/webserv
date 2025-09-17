@@ -1,10 +1,13 @@
-#include "../includes/WebServer.hpp"
-#include "../includes/ServerSocket.hpp"
+#include "WebServer.hpp"
+#include "ServerSocket.hpp"
+#include <utils/Logger.hpp>
 #include <iostream>
 #include <string>
 
 int	main(int argc, char** argv)
 {
+  Logger::instance();
+ 
 	std::string	configFile;
 
 	if (argc > 2)
