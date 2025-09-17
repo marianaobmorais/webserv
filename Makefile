@@ -10,9 +10,12 @@ SRCS = srcs/main.cpp \
 	$(REQUEST_PATH)/RequestParse.cpp \
 	$(RESPONSE_PATH)/HttpResponse.cpp \
 	$(RESPONSE_PATH)/ResponseBuilder.cpp \
-	$(UTILS_PATH)/Logger.cpp
+	$(UTILS_PATH)/Logger.cpp \
+  srcs/WebServer.cpp \
+	srcs/ServerSocket.cpp \
+	srcs/ClientConnection.cpp \
 
-#OBJS = $(SRCS:.cpp=.o)
+OBJS = $(SRCS:.cpp=.o)
 
 CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g
@@ -24,8 +27,8 @@ $(NAME): $(OBJS)
 
 all: $(NAME)
 
-# %.o: %.cpp
-# 		$(CXX) $(CXXFLAGS) -c $< -o $@
+%.o: %.cpp
+ 		$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 		$(RM) $(OBJS)

@@ -4,7 +4,7 @@
 
 # Webserv
 
-#### Finished in: 2025-08-01
+#### ongoing
 
 This project was done in group with [Mariana Morais](https://github.com/marianaobmorais) and [Matheus Castro](https://github.com/malves-b)
 
