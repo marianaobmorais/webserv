@@ -1,4 +1,7 @@
-#include "../includes/ClientConnection.hpp"
+#include <init/ClientConnection.hpp>
+#include <request/RequestParse.hpp>
+#include <response/ResponseBuilder.hpp> // response
+#include <utils/Logger.hpp>
 #include <unistd.h> //close()
 #include <sys/socket.h>
 #include <fcntl.h>
@@ -7,7 +10,10 @@
 #include <stdexcept>
 #include <string>
 
-ClientConnection::ClientConnection(int fd) : _fd(fd), _sentBytes(0) {}
+ClientConnection::ClientConnection(int fd) : _fd(fd), _sentBytes(0)
+{
+	this->_httpResponse.setStatusCode(ResponseStatus::NotFound);
+}
 
 ClientConnection::ClientConnection(ClientConnection const& src) : _fd(src._fd) {}
 
@@ -31,12 +37,12 @@ ssize_t	ClientConnection::recvData(void)
 	if (bytesRecv > 0)
 	{
 		_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
+		std::cout << _requestBuffer << std::endl; //debug
+		RequestParse::handleRawRequest(buffer, _httpRequest); //not working properly
 		return (bytesRecv);
 	}
 	if (bytesRecv == 0)
 		return (0);
-	if (errno == EAGAIN || errno == EWOULDBLOCK)
-		return (-1);
 	std::string	errorMsg(strerror(errno));
 	throw std::runtime_error("error: recv: " + errorMsg);
 }
@@ -53,24 +59,15 @@ ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t
 	bytesSent = send(client.getFD(), client.getResponseBuffer().c_str() + sent, toSend, 0);
 	if (bytesSent >= 0)
 		return (bytesSent);
-	if (errno == EAGAIN || errno == EWOULDBLOCK)
-		return (-1);
 	std::string	errorMsg(strerror(errno));
 	throw	std::runtime_error("error: send: " + errorMsg);
 }
 
-bool	ClientConnection::completedRequest(void) //TODO
+bool	ClientConnection::completedRequest(void)
 {
-	//GET
-	if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
+	if (_httpRequest.getState() == RequestState::Complete)
 		return (true);
-
-	//POST
-	//if()
-
-	//DELETE
-	//if()
-
+	Logger::instance().log(DEBUG, "Request not completed");
 	return (false);
 }
 
@@ -95,9 +92,12 @@ std::string const&	ClientConnection::getRequestBuffer(void) const
 	return (_requestBuffer);
 }
 
-std::string const&	ClientConnection::getResponseBuffer(void) const
+std::string /* const& */	ClientConnection::getResponseBuffer(void) //const
 {
-	return (_responseBuffer);
+	ResponseBuilder::run(this->_httpResponse, "");
+	std::cout << "this->_httpResponse: >>>>>" << ResponseBuilder::responseToString(this->_httpResponse) << "<<<<<" <<std::endl;
+	return (ResponseBuilder::responseToString(this->_httpResponse));
+	//return (_responseBuffer);
 }
 
 void		ClientConnection::setSentBytes(size_t bytes)
