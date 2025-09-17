@@ -4,7 +4,7 @@
 #include <request/RequestParse.hpp>
 #include <request/RequestParseError.hpp>
 #include <request/RequestState.hpp>
-#include <string_utils.hpp>
+#include <utils/string_utils.hpp>
 
 void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& request)
 {
