@@ -50,17 +50,17 @@ void	WebServer::receiveRequest(size_t i)
 		{
 			ssize_t	bytesRecv = client.recvData();
 
-			if (bytesRecv > 0 /* && client.completedRequest() */) // >= 0?
+			if (bytesRecv > 0 && client.completedRequest()) // >= 0?
 			{
 				std::cout << client.getRequestBuffer() << std::endl; //debug
 				client.setResponseBuffer(client.getResponseBuffer());
-				// std::string response =
-				// 	"HTTP/1.1 200 OK\r\n"
-				// 	"Content-Type: text/plain\r\n"
-				// 	"Content-Length: 12\r\n"
-				// 	"\r\n"
-				// 	"Hello World!"; //debug
-				//client.setResponseBuffer(response);
+				std::string response =
+					"HTTP/1.1 200 OK\r\n"
+					"Content-Type: text/plain\r\n"
+					"Content-Length: 12\r\n"
+					"\r\n"
+					"Hello World!"; //debug
+				client.setResponseBuffer(response);
 				client.clearBuffer(); //rename
 				this->_pollFDs[i].events = POLLOUT; //After receiving a full request, switch events to POLLOUT
 				client.setSentBytes(0);

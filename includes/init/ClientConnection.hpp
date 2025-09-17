@@ -32,7 +32,7 @@ class ClientConnection
 		int const&			getFD(void) const;
 		size_t const&		getSentBytes(void) const;
 		std::string const&	getRequestBuffer(void) const;
-		std::string /* const& */	getResponseBuffer(void) /* const */;
+		std::string const&	getResponseBuffer(void) const;
 		void				setSentBytes(size_t bytes);
 		void				setResponseBuffer(std::string buffer);
 };
