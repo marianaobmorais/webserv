@@ -17,7 +17,7 @@ void	WebServer::startServer(void)
 	this->_serverSocket.listenConnections(SOMAXCONN);
 
 	//start _pollFDs vector
-	// the server's listening socket is always the first [0], the client ones start from index 1
+	// the server's listening socket will be the first ones, the client ones will start after adding the sockt fds
 	this->addToPollFD(this->_serverSocket.getFD(), POLLIN); // monitor for incoming connections
 }
 

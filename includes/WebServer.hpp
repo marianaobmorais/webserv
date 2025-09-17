@@ -10,8 +10,8 @@ class Config;
 class WebServer
 {
 	private:
-		Config const&					_config; //probably const and reference //later
-		ServerSocket					_serverSocket;
+		Config const&					_config;
+		ServerSocket					_serverSocket; //vector
 		std::map<int, ClientConnection>	_clients; //can also hold fd set to -1
 		std::vector<struct pollfd>		_pollFDs;
 		//bool							run; //to handle the run loop
