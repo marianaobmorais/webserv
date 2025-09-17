@@ -15,26 +15,27 @@ SRCS = srcs/main.cpp \
 	srcs/ServerSocket.cpp \
 	srcs/ClientConnection.cpp \
 
-#OBJS = $(SRCS:.cpp=.o) #it does't compile with OBJS
+OBJS_DIR = objs
+OBJS = $(SRCS:srcs/%.cpp=$(OBJS_DIR)/%.o)
 
 #add logs folder
-#add objs folder
 
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g -Iincludes
 
 RM = rm -f
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -DDEV=1 -I./includes $(SRCS) -o $(NAME)
+	$(CXX) $(CXXFLAGS) -DDEV=1 $(OBJS) -o $(NAME)
 
 all: $(NAME)
 
-#%.o: %.cpp
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(OBJS_DIR)/%.o: srcs/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS_DIR) 
 
 fclean: clean
 	$(RM) $(NAME)
