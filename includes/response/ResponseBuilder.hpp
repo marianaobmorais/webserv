@@ -23,7 +23,7 @@ class ResponseBuilder
 
 	public:
 		static const std::string	responseToString(HttpResponse& response);
-		static void					run(HttpResponse& response, const std::string& output /* config */);
+		static void					run(HttpResponse& response/* , const std::string& output */ /* config */);
 };
 
 #endif //RESPONSE_BUILDER_HPP

@@ -26,11 +26,11 @@ std::string	ResponseBuilder::errorPageGenerator(ResponseStatus::code code)
 
 	oss << "<!DOCTYPE html>\r\n"
 		<< "<html>\r\n"
-		<< "<head><title>Erro " << code << "</title></head>\r\n"
+		<< "<head><title>Error " << code << "</title></head>\r\n"
 		<< "<body style=\"text-align: center; padding: 50px;\">\r\n"
-		<< "<h1>" << code << " - Erro</h1>\r\n"
+		<< "<h1>" << code << " - Error</h1>\r\n"
 		<< "<img src=\"https://http.cat/" << code
-		<< " alt=\"Erro HTTP " << code << "\" style=\"max-width: 80%; height: auto;\">\r\n"
+		<< " alt=\"Error HTTP " << code << "\" style=\"max-width: 80%; height: auto;\">\r\n"
 		<< "</body>\r\n"
 		<< "</html>\r\n";
 
@@ -58,11 +58,13 @@ const std::string	ResponseBuilder::responseToString(HttpResponse& response)
 		oss << it->first << ":" << it->second << "\r\n";
 	}
 
+	oss << "\r\n";
+
 	if (!response.isChunked())
 		oss << response.getBody();
 	//else
 		//TODO body chunks
-
+	oss << "\r\n";
 	Logger::instance().log(DEBUG, "[Finished] ResponseBuilder::responseToString");
 	return (oss.str());
 }
@@ -117,7 +119,7 @@ void	ResponseBuilder::handleCgiOutput(HttpResponse& response, const std::string&
 	response.addHeader("Content-Length", toString(bodyPart.size()));
 }
 
-void	ResponseBuilder::run(HttpResponse& response, const std::string& output /* request */ /* config */)
+void	ResponseBuilder::run(HttpResponse& response /* const std::string& output */ /* request */ /* config */)
 {
 	Logger::instance().log(DEBUG, "[Started] ResponseBuilder::run");
 
@@ -128,8 +130,8 @@ void	ResponseBuilder::run(HttpResponse& response, const std::string& output /* r
 		//TODO close connection ?
 		//TODO clear body ?
 		std::string content;
-		if (false) //find error in config
-		{
+		//if (false) //find error in config
+		//{
 			;
 			//const std::string& path = "path"; //config
 
@@ -137,16 +139,16 @@ void	ResponseBuilder::run(HttpResponse& response, const std::string& output /* r
 			// {
 			// 	staticPage(response, content, mimeType(path));
 			// }
-		}
-		else
-		{
-			content = errorPageGenerator(response.getStatusCode());
-			handleStaticPage(response, content, "text/html");
-		}
+		//}
+		//else
+		//{
+		content = errorPageGenerator(response.getStatusCode());
+		handleStaticPage(response, content, "text/html");
+		//}
 	}
 
 	// if (StaticPage)
-	handleStaticPage(response, output, "text/html" /* mimeType(path) */);
+	//handleStaticPage(response, output, "text/html" /* mimeType(path) */);
 	// if (CGI)
 	// 	handleCgiOutput(response, output);
 
