@@ -3,7 +3,8 @@
 
 #include <string>
 #include <sys/types.h>
-
+#include <request/HttpRequest.hpp>
+#include <response/HttpResponse.hpp>
 
 class ClientConnection
 {
@@ -13,8 +14,8 @@ class ClientConnection
 		std::string			_responseBuffer;
 		size_t				_sentBytes;
 		//time_t				_lastActive;
-		//httpresquet
-		//httpresponse
+		HttpRequest			_httpRequest;
+		HttpResponse		_httpResponse;
 
 		ClientConnection&	operator=(ClientConnection const& rhs); //memmove?
 	public:
@@ -31,7 +32,7 @@ class ClientConnection
 		int const&			getFD(void) const;
 		size_t const&		getSentBytes(void) const;
 		std::string const&	getRequestBuffer(void) const;
-		std::string const&	getResponseBuffer(void) const;
+		std::string /* const& */	getResponseBuffer(void) /* const */;
 		void				setSentBytes(size_t bytes);
 		void				setResponseBuffer(std::string buffer);
 };

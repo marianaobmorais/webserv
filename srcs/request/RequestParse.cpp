@@ -67,6 +67,7 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 	}
 	if (i > 0)
 		request.getRaw().erase(0, i);
+	std::cout << "handleRawRequest: " << request.getRaw() << std::endl; //debug
 }
 
 void	RequestParse::requestLine(const std::string& buffer, HttpRequest& request)

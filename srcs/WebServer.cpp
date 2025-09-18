@@ -1,4 +1,4 @@
-#include "../includes/WebServer.hpp"
+#include <init/WebServer.hpp>
 #include <sys/socket.h> // SOMAXCONN
 #include <unistd.h> //close()
 #include <errno.h>
@@ -29,7 +29,7 @@ void	WebServer::queueClientConnections(void)
 		int	newClientFD = newFDs[j];
 		if (_clients.find(newClientFD) == _clients.end()) //avoid adding duplicates
 		{
-			std::cout << "queueClientConnections: fd: " << newFDs[j] << std::endl; //debug
+			//std::cout << "queueClientConnections: fd: " << newFDs[j] << std::endl; //debug
 			//new client connection
 			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD)));
 
@@ -50,17 +50,17 @@ void	WebServer::receiveRequest(size_t i)
 		{
 			ssize_t	bytesRecv = client.recvData();
 
-			if (bytesRecv > 0 && client.completedRequest() /* request.getState() */)
+			if (bytesRecv > 0 /* && client.completedRequest() */) // >= 0?
 			{
 				std::cout << client.getRequestBuffer() << std::endl; //debug
-				//TODO : client.setResponseBuffer(HTTPresponse(client));
-				std::string response =
-					"HTTP/1.1 200 OK\r\n"
-					"Content-Type: text/plain\r\n"
-					"Content-Length: 12\r\n"
-					"\r\n"
-					"Hello World!"; //debug
-				client.setResponseBuffer(response);
+				client.setResponseBuffer(client.getResponseBuffer());
+				// std::string response =
+				// 	"HTTP/1.1 200 OK\r\n"
+				// 	"Content-Type: text/plain\r\n"
+				// 	"Content-Length: 12\r\n"
+				// 	"\r\n"
+				// 	"Hello World!"; //debug
+				//client.setResponseBuffer(response);
 				client.clearBuffer(); //rename
 				this->_pollFDs[i].events = POLLOUT; //After receiving a full request, switch events to POLLOUT
 				client.setSentBytes(0);

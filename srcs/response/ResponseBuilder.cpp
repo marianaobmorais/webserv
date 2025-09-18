@@ -130,7 +130,8 @@ void	ResponseBuilder::run(HttpResponse& response, const std::string& output /* r
 		std::string content;
 		if (false) //find error in config
 		{
-			const std::string& path = "path"; //config
+			;
+			//const std::string& path = "path"; //config
 
 			// if readfile(path, content)
 			// {
