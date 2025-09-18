@@ -12,7 +12,7 @@
 
 ClientConnection::ClientConnection(int fd) : _fd(fd), _sentBytes(0)
 {
-	this->_httpResponse.setStatusCode(ResponseStatus::NotFound);
+	//this->_httpResponse.setStatusCode(ResponseStatus::NotFound);
 }
 
 ClientConnection::ClientConnection(ClientConnection const& src) : _fd(src._fd) {}
@@ -66,9 +66,18 @@ ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t
 bool	ClientConnection::completedRequest(void)
 {
 	if (_httpRequest.getState() == RequestState::Complete)
+	{
+		Logger::instance().log(DEBUG, "Request completed");
+		ResponseBuilder::run(this->_httpResponse); //test
+		setResponseBuffer( ResponseBuilder::responseToString(this->_httpResponse)); //test
 		return (true);
+	}
 	Logger::instance().log(DEBUG, "Request not completed");
 	return (false);
+
+	// if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
+	// 	return (true);
+	// return (false);
 }
 
 void	ClientConnection::clearBuffer(void) //rename
@@ -94,10 +103,9 @@ std::string const&	ClientConnection::getRequestBuffer(void) const
 
 std::string /* const& */	ClientConnection::getResponseBuffer(void) //const
 {
-	ResponseBuilder::run(this->_httpResponse, "");
 	std::cout << "this->_httpResponse: >>>>>" << ResponseBuilder::responseToString(this->_httpResponse) << "<<<<<" <<std::endl;
-	return (ResponseBuilder::responseToString(this->_httpResponse));
-	//return (_responseBuffer);
+	//return (ResponseBuilder::responseToString(this->_httpResponse));
+	return (_responseBuffer);
 }
 
 void		ClientConnection::setSentBytes(size_t bytes)

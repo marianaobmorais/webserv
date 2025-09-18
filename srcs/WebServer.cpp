@@ -1,4 +1,5 @@
 #include <init/WebServer.hpp>
+#include <response/ResponseBuilder.hpp>
 #include <sys/socket.h> // SOMAXCONN
 #include <unistd.h> //close()
 #include <errno.h>
@@ -50,10 +51,10 @@ void	WebServer::receiveRequest(size_t i)
 		{
 			ssize_t	bytesRecv = client.recvData();
 
-			if (bytesRecv > 0 /* && client.completedRequest() */) // >= 0?
+			if (bytesRecv > 0 && client.completedRequest()) // >= 0?
 			{
 				std::cout << client.getRequestBuffer() << std::endl; //debug
-				client.setResponseBuffer(client.getResponseBuffer());
+				//client.setResponseBuffer(client.getResponseBuffer());
 				// std::string response =
 				// 	"HTTP/1.1 200 OK\r\n"
 				// 	"Content-Type: text/plain\r\n"
