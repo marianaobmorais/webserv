@@ -2,7 +2,7 @@
 
 HttpResponse::HttpResponse()
 {
-	setStatusCode(ResponseStatus::OK);
+	setStatusCode(ResponseStatus::NotFound);
 	setVersion("1.1");
 	setChunked(false);
 }
