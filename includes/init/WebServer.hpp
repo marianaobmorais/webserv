@@ -1,7 +1,8 @@
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
 
-#include "ServerSocket.hpp"
+#include <ServerSocket.hpp>
+#include <config/ServerConfig.hpp>
 #include <vector>
 #include <map>
 
@@ -10,7 +11,10 @@ class Config;
 class WebServer
 {
 	private:
-		Config const&					_config;
+		std::vector<ServerConfig>		_config;
+		std::map<int, size_t>			_FDToConfig; // FD to index in _config
+		//std::vector<ServerSocket>		_serverSocket;
+
 		ServerSocket					_serverSocket; //vector
 		std::map<int, ClientConnection>	_clients; //can also hold fd set to -1
 		std::vector<struct pollfd>		_pollFDs;
