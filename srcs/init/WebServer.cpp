@@ -1,4 +1,4 @@
-#include "../includes/WebServer.hpp"
+#include <init/WebServer.hpp>
 #include <sys/socket.h> // SOMAXCONN
 #include <unistd.h> //close()
 #include <errno.h>
@@ -13,11 +13,11 @@ WebServer::~WebServer(void){}
 
 void	WebServer::startServer(void)
 {
-	this->_serverSocket.startSocket("8080"); //this parameter will be from config file probably
+	this->_serverSocket.startSocket("8080"); //this parameter will be from config file
 	this->_serverSocket.listenConnections(SOMAXCONN);
 
 	//start _pollFDs vector
-	// the server's listening socket is always the first [0], the client ones start from index 1
+	// the server's listening socket will be the first indexes, the client ones will start after them
 	this->addToPollFD(this->_serverSocket.getFD(), POLLIN); // monitor for incoming connections
 }
 
@@ -29,7 +29,7 @@ void	WebServer::queueClientConnections(void)
 		int	newClientFD = newFDs[j];
 		if (_clients.find(newClientFD) == _clients.end()) //avoid adding duplicates
 		{
-			std::cout << "queueClientConnections: fd: " << newFDs[j] << std::endl; //debug
+			//std::cout << "queueClientConnections: fd: " << newFDs[j] << std::endl; //debug
 			//new client connection
 			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD)));
 
@@ -50,10 +50,10 @@ void	WebServer::receiveRequest(size_t i)
 		{
 			ssize_t	bytesRecv = client.recvData();
 
-			if (bytesRecv > 0 && client.completedRequest() /* request.getState() */)
+			if (bytesRecv > 0 && client.completedRequest())
 			{
 				std::cout << client.getRequestBuffer() << std::endl; //debug
-				//TODO : client.setResponseBuffer(HTTPresponse(client));
+				client.setResponseBuffer(client.getResponseBuffer());
 				std::string response =
 					"HTTP/1.1 200 OK\r\n"
 					"Content-Type: text/plain\r\n"
