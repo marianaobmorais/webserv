@@ -21,7 +21,9 @@ int	main(int argc, char** argv)
 	try
 	{
 		Config		config(configFile);
-		WebServer	server;
+		//config.parseConfig();
+
+		WebServer	server(config);
 		server.startServer();
 		server.runServer();
 	}

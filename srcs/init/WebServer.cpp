@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <iostream>
 
-WebServer::WebServer(void) : _serverSocket() {}
+WebServer::WebServer(Config const& config) : _config(config), _serverSocket() {}
 
 WebServer::~WebServer(void){}
 
@@ -17,7 +17,7 @@ void	WebServer::startServer(void)
 	this->_serverSocket.listenConnections(SOMAXCONN);
 
 	//start _pollFDs vector
-	// the server's listening socket will be the first indexes, the client ones will start after them
+	// the server's listening socket will be the first ones, the client ones will start after adding the sockt fds
 	this->addToPollFD(this->_serverSocket.getFD(), POLLIN); // monitor for incoming connections
 }
 
@@ -151,6 +151,7 @@ void	WebServer::runServer(void)
 {
 	while (true)
 	{
+		//subject: A request to your server should never hang indefinitely
 		int timeout = getPollTimeout(false); //update poll() timeout parameter accordingly to the presence of CGI process
 		int	ready = ::poll(&this->_pollFDs[0], this->_pollFDs.size(), timeout);
 

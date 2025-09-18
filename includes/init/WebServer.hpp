@@ -6,11 +6,12 @@
 #include <map>
 
 class ClientConnection;
+class Config;
 class WebServer
 {
 	private:
-		//Config						_config; //probably const and reference //later
-		ServerSocket					_serverSocket;
+		Config const&					_config;
+		ServerSocket					_serverSocket; //vector
 		std::map<int, ClientConnection>	_clients; //can also hold fd set to -1
 		std::vector<struct pollfd>		_pollFDs;
 		//bool							run; //to handle the run loop
@@ -18,15 +19,15 @@ class WebServer
 		WebServer(WebServer const& src); //memmove?
 		WebServer&						operator=(WebServer const& rhs); //memmove?
 	public:
-		WebServer(void);
+		WebServer(Config const& config);
 		~WebServer(void);
 
 		void							startServer(void);
 		void							runServer(void); //run loop
 		void							queueClientConnections(void);
 		void							addToPollFD(int fd, short events);
-		void							receiveRequest(size_t i);
-		void							sendResponse(size_t i);
+		void							receiveRequest(std::size_t i);
+		void							sendResponse(std::size_t i);
 		void							removeClientConnection(int clientFD, size_t pollFDIndex);
 		//later
 		//void							stop(void); //cleanup
