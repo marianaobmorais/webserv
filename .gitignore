@@ -33,3 +33,4 @@
 webserv
 logs/
 
+srcs/response/ResponseBuilder.cpp
