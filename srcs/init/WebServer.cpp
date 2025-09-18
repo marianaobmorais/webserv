@@ -13,11 +13,11 @@ WebServer::~WebServer(void){}
 
 void	WebServer::startServer(void)
 {
-	this->_serverSocket.startSocket("8080"); //this parameter will be from config file probably
+	this->_serverSocket.startSocket("8080"); //this parameter will be from config file
 	this->_serverSocket.listenConnections(SOMAXCONN);
 
 	//start _pollFDs vector
-	// the server's listening socket is always the first [0], the client ones start from index 1
+	// the server's listening socket will be the first indexes, the client ones will start after them
 	this->addToPollFD(this->_serverSocket.getFD(), POLLIN); // monitor for incoming connections
 }
 
@@ -50,7 +50,7 @@ void	WebServer::receiveRequest(size_t i)
 		{
 			ssize_t	bytesRecv = client.recvData();
 
-			if (bytesRecv > 0 && client.completedRequest()) // >= 0?
+			if (bytesRecv > 0 && client.completedRequest())
 			{
 				std::cout << client.getRequestBuffer() << std::endl; //debug
 				client.setResponseBuffer(client.getResponseBuffer());
