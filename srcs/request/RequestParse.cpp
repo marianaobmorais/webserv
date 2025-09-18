@@ -41,7 +41,10 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 				{
 					if (buffer.empty())
 					{
-						request.setRequestState(RequestState::Body);
+						if (request.getMeta().getContentLength() == -1 && !request.getMeta().isChunked())
+							request.setRequestState(RequestState::Complete);
+						else
+							request.setRequestState(RequestState::Body);
 						request.clearBuffer();
 						i += 2;
 						break ;
@@ -67,7 +70,7 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 	}
 	if (i > 0)
 		request.getRaw().erase(0, i);
-	std::cout << "handleRawRequest: " << request.getRaw() << std::endl; //debug
+
 }
 
 void	RequestParse::requestLine(const std::string& buffer, HttpRequest& request)
