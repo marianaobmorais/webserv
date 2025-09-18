@@ -38,7 +38,7 @@ ssize_t	ClientConnection::recvData(void)
 	{
 		_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
 		std::cout << _requestBuffer << std::endl; //debug
-		RequestParse::handleRawRequest(buffer, _httpRequest); //not working properly
+		RequestParse::handleRawRequest(buffer, _httpRequest);
 		return (bytesRecv);
 	}
 	if (bytesRecv == 0)
