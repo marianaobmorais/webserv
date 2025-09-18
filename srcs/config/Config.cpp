@@ -1,4 +1,4 @@
-#include "../includes/Config.hpp"
+#include <config/Config.hpp>
 
 Config::Config(std::string filePath) : _path(filePath) {}
 

@@ -4,6 +4,7 @@ REQUEST_PATH = srcs/request
 RESPONSE_PATH = srcs/response
 UTILS_PATH = srcs/utils
 INIT_PATH = srcs/init
+CONFIG_PATH = srcs/config
 
 SRCS = srcs/main.cpp \
 	$(REQUEST_PATH)/HttpRequest.cpp \
@@ -15,7 +16,7 @@ SRCS = srcs/main.cpp \
 	$(INIT_PATH)/WebServer.cpp \
 	$(INIT_PATH)/ServerSocket.cpp \
 	$(INIT_PATH)/ClientConnection.cpp \
-	srcs/Config.cpp \
+	$(CONFIG_PATH)/Config.cpp \
 
 OBJS_DIR = objs
 OBJS = $(SRCS:srcs/%.cpp=$(OBJS_DIR)/%.o)
