@@ -1,5 +1,6 @@
 #include <init/WebServer.hpp>
 #include <init/ServerSocket.hpp>
+#include <config/ConfigParser.hpp>
 #include <config/Config.hpp>
 #include <utils/Logger.hpp>
 #include <iostream>
@@ -21,8 +22,7 @@ int	main(int argc, char** argv)
 		configFile = argv[1];
 	try
 	{
-		Config		config(configFile);
-		//config.parseConfig();
+		Config		config = ConfigParser::parseFile(configFile);
 
 		WebServer	server(config);
 		server.startServer();

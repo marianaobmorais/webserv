@@ -1,20 +1,21 @@
-#ifndef CONFIG_H
-# define CONFIG_H
+#ifndef CONFIG_HPP
+# define CONFIG_HPP
 
-#include <string>
+#include <ServerConfig.hpp>
+#include <vector>
 
 class Config
 {
 	private:
-		std::string	const _path;
-
+		std::vector<ServerConfig>	_servers;
 		Config(Config const& src);
-		Config&		operator=(Config const& rhs);
+		Config&	operator=(Config const& rhs);
 	public:
-		Config(std::string file);
+		Config(void);
 		~Config(void);
 
-		void		lexer(void);
+		//accessors
+		std::vector<ServerConfig> const&	getServerConfig(void) const;
 };
 
-#endif //CONFIG_H
+#endif //CONFIG_HPP
