@@ -7,6 +7,7 @@
 int	main(int argc, char** argv)
 {
 	Logger::instance();
+	Logger::instance().log(INFO, "Webservinho Started");
 	std::string	configFile;
 
 	if (argc > 2)
