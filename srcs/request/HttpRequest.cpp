@@ -63,6 +63,11 @@ void	HttpRequest::setRequestState(RequestState::state state)
 	this->_state = state;
 }
 
+void	HttpRequest::setRouteType(RouteType::route route)
+{
+	this->_route = route;
+}
+
 void	HttpRequest::appendRaw(const std::string& chunk)
 {
 	this->_rawRequest += chunk;
@@ -91,6 +96,11 @@ void	HttpRequest::setParsingChunkSize(bool value)
 void	HttpRequest::setExpectingChunkSeparator(bool value)
 {
 	this->_expectingChunkSeparator = value;
+}
+
+void	HttpRequest::setResolvedPath(const std::string path)
+{
+	this->_resolvedPath = path;
 }
 
 RequestMethod::Method	HttpRequest::getMethod(void) const
@@ -141,6 +151,11 @@ RequestState::state	HttpRequest::getState(void) const
 	return (this->_state);
 }
 
+RouteType::route	HttpRequest::getRouteType(void) const
+{
+	return (this->_route);
+}
+
 std::string&	HttpRequest::getRaw(void)
 {
 	return (this->_rawRequest);
@@ -169,4 +184,9 @@ bool	HttpRequest::isParsingChunkSize(void) const
 bool	HttpRequest::isExpectingChunkSeparator(void) const
 {
 	return (this->_expectingChunkSeparator);
+}
+
+const std::string	HttpRequest::getResolvedPath(void) const
+{
+	return (this->_resolvedPath);
 }
