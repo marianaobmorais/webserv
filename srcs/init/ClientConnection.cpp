@@ -118,3 +118,5 @@ void	ClientConnection::setResponseBuffer(std::string buffer)
 	this->_responseBuffer = buffer;
 }
 
+HttpRequest&	ClientConnection::getRequest(void) {return this->_httpRequest;}
+HttpResponse&	ClientConnection::getResponse(void) {return this->_httpResponse;}
