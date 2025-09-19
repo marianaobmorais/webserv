@@ -3,7 +3,7 @@
 HttpRequest::HttpRequest()
 {
 	setMethod(RequestMethod::INVALID);
-	setParseError(RequestParseError::OK);
+	setParseError(ResponseStatus::OK);
 	getMeta().setContentLength(-1);
 	getMeta().setChunked(false);
 	getMeta().setConnectionClose(false);
@@ -53,7 +53,7 @@ void	HttpRequest::appendBody(char c)
 	this->_body.push_back(c);
 }
 
-void	HttpRequest::setParseError(RequestParseError::reason reason)
+void	HttpRequest::setParseError(ResponseStatus::code reason)
 {
 	this->_parseError = reason;
 }
@@ -131,7 +131,7 @@ const std::string&	HttpRequest::getBody(void) const
 	return (this->_body);
 }
 
-RequestParseError::reason	HttpRequest::getParseError(void) const
+ResponseStatus::code	HttpRequest::getParseError(void) const
 {
 	return (this->_parseError);
 }

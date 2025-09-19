@@ -2,9 +2,9 @@
 #include <exception>
 #include <cstdlib>
 #include <request/RequestParse.hpp>
-#include <request/RequestParseError.hpp>
 #include <request/RequestState.hpp>
 #include <utils/string_utils.hpp>
+#include <response/ResponseStatus.hpp>
 
 void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& request)
 {
@@ -28,7 +28,7 @@ void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& reque
 					break ;
 				if (rawRequest[i + 1] != '\n')
 				{
-					request.setParseError(RequestParseError::InvalidHeader);
+					request.setParseError(ResponseStatus::BadRequest);
 					return ;
 				}
 				if (request.getState() == RequestState::RequestLine)
@@ -79,7 +79,7 @@ void	RequestParse::requestLine(const std::string& buffer, HttpRequest& request)
 
 	if (tokens.size() != 3)
 	{
-		request.setParseError(RequestParseError::BadRequestLine);
+		request.setParseError(ResponseStatus::BadRequest);
 		return ;
 	}
 
@@ -90,20 +90,20 @@ void	RequestParse::requestLine(const std::string& buffer, HttpRequest& request)
 	if (version.size() < 8 || version.substr(0, 5) != "HTTP/"
 		|| version.find('.') == std::string::npos)
 	{
-		request.setParseError(RequestParseError::InvalidVersion);
+		request.setParseError(ResponseStatus::BadRequest);
 		return ;
 	}
 
 	std::vector<std::string> parts = split(version.substr(5), ".");
 	if (parts.size() != 2)
 	{
-		request.setParseError(RequestParseError::InvalidVersion);
+		request.setParseError(ResponseStatus::BadRequest);
 		return ;
 	}
-	//TODO who controls the version?
+
 	if (parts[0] != "1" || parts[1] != "1")
 	{
-		request.setParseError(RequestParseError::UnsupportedVersion);
+		request.setParseError(ResponseStatus::HttpVersionNotSupported);
 		return ;
 	}
 
@@ -124,7 +124,7 @@ void	RequestParse::method(const std::string& method, HttpRequest& request)
 	else
 	{
 		request.setMethod(RequestMethod::INVALID);
-		request.setParseError(RequestParseError::InvalidMethod);
+		request.setParseError(ResponseStatus::MethodNotAllowed);
 	}
 }
 
@@ -134,7 +134,7 @@ void	RequestParse::headers(const std::string& buffer, HttpRequest& request)
 
 	if (pos == std::string::npos)
 	{
-		request.setParseError(RequestParseError::InvalidHeader);
+		request.setParseError(ResponseStatus::BadRequest);
 		return ;
 	}
 
@@ -155,7 +155,7 @@ void	RequestParse::headers(const std::string& buffer, HttpRequest& request)
 		if (toLower(value) == "100-continue")
 			request.getMeta().setExpectContinue(true);
 		else
-			request.setParseError(RequestParseError::InvalidHeader);
+			request.setParseError(ResponseStatus::BadRequest);
 	}
 	request.addHeader(key, value);
 }
@@ -192,7 +192,7 @@ void	RequestParse::bodyChunked(char c, HttpRequest& request)
 		}
 		else if (buffer.size() > 2)
 		{
-			request.setParseError(RequestParseError::InvalidHeader);
+			request.setParseError(ResponseStatus::BadRequest);
 			request.setRequestState(RequestState::Complete);
 		}
 		return ;
@@ -211,7 +211,7 @@ void	RequestParse::bodyChunked(char c, HttpRequest& request)
 			request.clearBuffer();
 			if (size < 0)
 			{
-				request.setParseError(RequestParseError::BadRequestLine);
+				request.setParseError(ResponseStatus::BadRequest);
 				request.setRequestState(RequestState::Complete);
 				return ;
 			}

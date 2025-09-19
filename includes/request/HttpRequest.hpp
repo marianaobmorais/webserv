@@ -8,8 +8,8 @@
 //webserv
 #include <request/RequestMethod.hpp>
 #include <request/RequestMeta.hpp>
-#include <request/RequestParseError.hpp>
 #include <request/RequestState.hpp>
+#include <response/ResponseStatus.hpp>
 
 //Data Transfer Object
 class HttpRequest
@@ -22,7 +22,7 @@ class HttpRequest
 		std::map<std::string, std::string>	_headers;
 		RequestMeta							_meta;
 		std::string							_body;
-		RequestParseError::reason			_parseError;
+		ResponseStatus::code				_parseError;
 		RequestState::state					_state;
 		std::string							_rawRequest;
 		std::string							_buffer;
@@ -44,7 +44,7 @@ class HttpRequest
 		void	setMinor(int minor);
 		void	appendBody(const std::string& body);
 		void	appendBody(char c);
-		void	setParseError(RequestParseError::reason reason);
+		void	setParseError(ResponseStatus::code reason);
 		void	addHeader(const std::string& name, const std::string& value);
 		void	setRequestState(RequestState::state state);
 		void	appendRaw(const std::string& chunk);
@@ -61,7 +61,7 @@ class HttpRequest
 		const RequestMeta&			getMeta(void) const;
 		RequestMeta&				getMeta(void);
 		const std::string&			getBody(void) const;
-		RequestParseError::reason	getParseError(void) const;
+		ResponseStatus::code		getParseError(void) const;
 		const std::string&			getHeader(const std::string& name) const;
 		RequestState::state			getState(void) const;
 		std::string&				getRaw(void);
