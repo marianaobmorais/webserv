@@ -13,6 +13,8 @@ SRCS = srcs/main.cpp \
 	$(RESPONSE_PATH)/HttpResponse.cpp \
 	$(RESPONSE_PATH)/ResponseBuilder.cpp \
 	$(DISPATCHER_PATH)/Router.cpp \
+	$(DISPATCHER_PATH)/Dispatcher.cpp \
+	$(DISPATCHER_PATH)/StaticPageHandler.cpp \
 	$(UTILS_PATH)/Logger.cpp \
 	$(INIT_PATH)/WebServer.cpp \
 	$(INIT_PATH)/ServerSocket.cpp \
