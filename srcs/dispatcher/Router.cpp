@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <dispacther/Router.hpp>
+#include <dispatcher/Router.hpp>
 #include <response/ResponseStatus.hpp>
 #include <init/ServerConfig.hpp>
 
@@ -37,10 +37,8 @@ bool	Router::checkErrorStatus(ResponseStatus::code status, HttpRequest& req, Htt
 	return (false);
 }
 
-void	Router::resolve(ClientConnection& client)
+void	Router::resolve(HttpRequest& request, HttpResponse& response)
 {
-	HttpRequest& request = client.getRequest();
-	HttpResponse& response = client.getResponse();
 
 	std::string index = ServerConfig::instance().index;
 	std::string cgiPath = ServerConfig::instance().cgiPath;

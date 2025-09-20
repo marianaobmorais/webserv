@@ -24,7 +24,7 @@ class Router
 						ResponseStatus::code& status);
 
 	public:
-		static void	resolve(ClientConnection& client);
+		static void	resolve(HttpRequest& request, HttpResponse& response);
 };
 
 #endif //ROUTER_HPP
