@@ -37,7 +37,7 @@ std::string	ResponseBuilder::errorPageGenerator(ResponseStatus::code code)
 	return (oss.str());
 }
 
-const std::string	ResponseBuilder::responseToString(HttpResponse& response)
+const std::string	ResponseBuilder::responseWriter(HttpResponse& response)
 {
 	std::ostringstream oss;
 
@@ -69,8 +69,8 @@ const std::string	ResponseBuilder::responseToString(HttpResponse& response)
 	return (oss.str());
 }
 
-void	ResponseBuilder::handleStaticPage(HttpResponse& response,
-			const std::string& output, const std::string& mimeType)
+void	ResponseBuilder::handleStaticPageOutput(HttpResponse& response,
+			const std::string output, const std::string& mimeType)
 {
 	response.setChunked(false);
 	response.addHeader("Content-Type", mimeType);
@@ -119,16 +119,17 @@ void	ResponseBuilder::handleCgiOutput(HttpResponse& response, const std::string&
 	response.addHeader("Content-Length", toString(bodyPart.size()));
 }
 
-void	ResponseBuilder::run(HttpResponse& response /* const std::string& output */ /* request */ /* config */)
+void	ResponseBuilder::build(HttpRequest& req, HttpResponse& res)
 {
-	Logger::instance().log(DEBUG, "[Started] ResponseBuilder::run");
+	Logger::instance().log(DEBUG, "[Started] ResponseBuilder::build");
 
-	setMinimumHeaders(response);
+	setMinimumHeaders(res);
 
-	if (response.getStatusCode() >= 400)
+	req.getMeta();
+
+	if (res.getStatusCode() >= 400)
 	{
-		//TODO close connection ?
-		//TODO clear body ?
+		res.addHeader("connection", "false");
 		std::string content;
 		//if (false) //find error in config
 		//{
@@ -142,15 +143,9 @@ void	ResponseBuilder::run(HttpResponse& response /* const std::string& output */
 		//}
 		//else
 		//{
-		content = errorPageGenerator(response.getStatusCode());
-		handleStaticPage(response, content, "text/html");
+		content = errorPageGenerator(res.getStatusCode());
+		handleStaticPageOutput(res, content, "text/html");
 		//}
 	}
-
-	// if (StaticPage)
-	//handleStaticPage(response, output, "text/html" /* mimeType(path) */);
-	// if (CGI)
-	// 	handleCgiOutput(response, output);
-
-	Logger::instance().log(DEBUG, "[Finished] ResponseBuilder::run");
+	Logger::instance().log(DEBUG, "[Finished] ResponseBuilder::build");
 }
