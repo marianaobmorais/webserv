@@ -1,5 +1,5 @@
 #include <init/WebServer.hpp>
-#include <response/ResponseBuilder.hpp>
+#include <dispatcher/Dispatcher.hpp>
 #include <sys/socket.h> // SOMAXCONN
 #include <unistd.h> //close()
 #include <errno.h>
@@ -62,6 +62,7 @@ void	WebServer::receiveRequest(size_t i)
 				// 	"\r\n"
 				// 	"Hello World!"; //debug
 				//client.setResponseBuffer(response);
+				Dispatcher::dispatch(client); //real oficial
 				client.clearBuffer(); //rename
 				this->_pollFDs[i].events = POLLOUT; //After receiving a full request, switch events to POLLOUT
 				client.setSentBytes(0);

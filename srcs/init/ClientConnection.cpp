@@ -68,8 +68,8 @@ bool	ClientConnection::completedRequest(void)
 	if (_httpRequest.getState() == RequestState::Complete)
 	{
 		Logger::instance().log(DEBUG, "Request completed");
-		ResponseBuilder::run(this->_httpResponse); //test
-		setResponseBuffer( ResponseBuilder::responseToString(this->_httpResponse)); //test
+		ResponseBuilder::build(this->_httpRequest, this->_httpResponse); //test
+		setResponseBuffer( ResponseBuilder::responseWriter(this->_httpResponse)); //test
 		return (true);
 	}
 	Logger::instance().log(DEBUG, "Request not completed");
@@ -103,8 +103,8 @@ std::string const&	ClientConnection::getRequestBuffer(void) const
 
 std::string /* const& */	ClientConnection::getResponseBuffer(void) //const
 {
-	std::cout << "this->_httpResponse: >>>>>" << ResponseBuilder::responseToString(this->_httpResponse) << "<<<<<" <<std::endl;
-	//return (ResponseBuilder::responseToString(this->_httpResponse));
+	std::cout << "this->_httpResponse: >>>>>" << ResponseBuilder::responseWriter(this->_httpResponse) << "<<<<<" <<std::endl;
+	//return (ResponseBuilder::responseWriter(this->_httpResponse));
 	return (_responseBuffer);
 }
 
@@ -113,7 +113,7 @@ void		ClientConnection::setSentBytes(size_t bytes)
 	this->_sentBytes = bytes;
 }
 
-void	ClientConnection::setResponseBuffer(std::string buffer)
+void	ClientConnection::setResponseBuffer(const std::string buffer)
 {
 	this->_responseBuffer = buffer;
 }
