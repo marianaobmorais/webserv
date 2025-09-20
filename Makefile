@@ -2,6 +2,7 @@ NAME = webserv
 
 REQUEST_PATH = srcs/request
 RESPONSE_PATH = srcs/response
+DISPATCHER_PATH = srcs/dispatcher
 UTILS_PATH = srcs/utils
 INIT_PATH = srcs/init
 
@@ -11,10 +12,12 @@ SRCS = srcs/main.cpp \
 	$(REQUEST_PATH)/RequestParse.cpp \
 	$(RESPONSE_PATH)/HttpResponse.cpp \
 	$(RESPONSE_PATH)/ResponseBuilder.cpp \
+	$(DISPATCHER_PATH)/Router.cpp \
 	$(UTILS_PATH)/Logger.cpp \
 	$(INIT_PATH)/WebServer.cpp \
 	$(INIT_PATH)/ServerSocket.cpp \
 	$(INIT_PATH)/ClientConnection.cpp \
+	$(INIT_PATH)/ServerConfig.cpp \
 
 OBJS_DIR = objs
 OBJS = $(SRCS:srcs/%.cpp=$(OBJS_DIR)/%.o)

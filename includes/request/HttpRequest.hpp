@@ -9,8 +9,8 @@
 #include <request/RequestMethod.hpp>
 #include <request/RequestMeta.hpp>
 #include <request/RequestState.hpp>
-#include <response/RouteType.hpp>
 #include <response/ResponseStatus.hpp>
+#include <dispatcher/RouteType.hpp>
 
 //Data Transfer Object
 class HttpRequest
