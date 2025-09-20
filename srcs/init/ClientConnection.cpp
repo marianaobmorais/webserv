@@ -1,6 +1,7 @@
 #include <init/ClientConnection.hpp>
 #include <request/RequestParse.hpp>
 #include <response/ResponseBuilder.hpp> // response
+#include <utils/string_utils.hpp>
 #include <utils/Logger.hpp>
 #include <unistd.h> //close()
 #include <sys/socket.h>
@@ -12,7 +13,7 @@
 
 ClientConnection::ClientConnection(int fd) : _fd(fd), _sentBytes(0)
 {
-	//this->_httpResponse.setStatusCode(ResponseStatus::NotFound);
+
 }
 
 ClientConnection::ClientConnection(ClientConnection const& src) : _fd(src._fd) {}
@@ -68,8 +69,8 @@ bool	ClientConnection::completedRequest(void)
 	if (_httpRequest.getState() == RequestState::Complete)
 	{
 		Logger::instance().log(DEBUG, "Request completed");
-		ResponseBuilder::build(this->_httpRequest, this->_httpResponse); //test
-		setResponseBuffer( ResponseBuilder::responseWriter(this->_httpResponse)); //test
+		Logger::instance().log(DEBUG,
+			"Request completed ParseError ->" + toString(_httpRequest.getParseError()));
 		return (true);
 	}
 	Logger::instance().log(DEBUG, "Request not completed");
@@ -103,8 +104,6 @@ std::string const&	ClientConnection::getRequestBuffer(void) const
 
 std::string /* const& */	ClientConnection::getResponseBuffer(void) //const
 {
-	std::cout << "this->_httpResponse: >>>>>" << ResponseBuilder::responseWriter(this->_httpResponse) << "<<<<<" <<std::endl;
-	//return (ResponseBuilder::responseWriter(this->_httpResponse));
 	return (_responseBuffer);
 }
 

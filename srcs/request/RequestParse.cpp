@@ -113,6 +113,7 @@ void	RequestParse::requestLine(const std::string& buffer, HttpRequest& request)
 
 void	RequestParse::method(const std::string& method, HttpRequest& request)
 {
+	//TODO config
 	if (method == "GET")
 		request.setMethod(RequestMethod::GET);
 	else if (method == "POST")

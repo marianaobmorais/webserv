@@ -45,6 +45,8 @@ const std::string StaticPageHandler::detectMimeType(const std::string& resolvedP
 void	StaticPageHandler::handle(HttpRequest& req, HttpResponse& res)
 {
 	Logger::instance().log(DEBUG, "[Started] StaticPageHandler::handle");
+	Logger::instance().log(DEBUG,
+			"StaticPageHandler::handle [Path -> " + req.getResolvedPath() + "]");
 	struct stat st;
 	if (stat(req.getResolvedPath().c_str(), &st) != 0)
 	{

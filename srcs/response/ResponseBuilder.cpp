@@ -122,6 +122,8 @@ void	ResponseBuilder::handleCgiOutput(HttpResponse& response, const std::string&
 void	ResponseBuilder::build(HttpRequest& req, HttpResponse& res)
 {
 	Logger::instance().log(DEBUG, "[Started] ResponseBuilder::build");
+	Logger::instance().log(DEBUG,
+		"[ResponseBuilder::build] [StatusCode ->" + toString(res.getStatusCode()) + "]");
 
 	setMinimumHeaders(res);
 

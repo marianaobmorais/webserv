@@ -5,6 +5,7 @@
 #include <dispatcher/Router.hpp>
 #include <response/ResponseStatus.hpp>
 #include <init/ServerConfig.hpp>
+#include <utils/Logger.hpp>
 
 void	Router::computeResolvedPath(HttpRequest& request)
 {
@@ -53,6 +54,9 @@ void	Router::resolve(HttpRequest& request, HttpResponse& response)
 
 	computeResolvedPath(request);
 
+	Logger::instance().log(DEBUG,
+		"computeResolvedPath [Path -> " + request.getResolvedPath() + "]");
+
 	if (isStaticFile(index, status, request))
 	{
 		request.setRouteType(RouteType::StaticPage);
@@ -74,6 +78,7 @@ void	Router::resolve(HttpRequest& request, HttpResponse& response)
 
 bool Router::isStaticFile(const std::string& index, ResponseStatus::code& status, HttpRequest& req)
 {
+	Logger::instance().log(DEBUG, "[Started] Router::isStaticFile");
 	std::string _resolvedPath = req.getResolvedPath();
 
 	// 1. Se for diretório, tentar adicionar index
@@ -82,12 +87,14 @@ bool Router::isStaticFile(const std::string& index, ResponseStatus::code& status
 	//check if the dir exists with stat
 	if (stat(_resolvedPath.c_str(), &s) == 0 && S_ISDIR(s.st_mode)) //it's a directory
 	{
+		Logger::instance().log(DEBUG, "Router::isStaticFile Its a directory");
 		// Adiciona barra se necessário
 		if (_resolvedPath[_resolvedPath.length() - 1] != '/')
 		{
 			_resolvedPath += '/';
 		}
 		_resolvedPath += index;
+		Logger::instance().log(DEBUG, "Router::isStaticFile Its a directory, path -> " + _resolvedPath);
 		// Re-testar com stat()
 		if (stat(_resolvedPath.c_str(), &s) != 0)
 			return (false);
