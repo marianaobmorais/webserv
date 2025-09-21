@@ -34,6 +34,8 @@ void	Dispatcher::dispatch(ClientConnection& client)
 
 	ResponseBuilder::build(req, res);
 
-	client.setResponseBuffer(ResponseBuilder::responseWriter(res));
+	client.setResponseBuffer(ResponseBuilder::responseWriter(res)); //TODO
+	req.reset();
+	res.reset();
 	Logger::instance().log(DEBUG, "[Finished] Dispatcher::dispatch");
 }

@@ -58,6 +58,7 @@ class HttpRequest
 		void	setParsingChunkSize(bool value);
 		void	setExpectingChunkSeparator(bool value);
 		void	setResolvedPath(const std::string path);
+		void	reset(void);
 
 		//getters
 		RequestMethod::Method		getMethod(void) const;

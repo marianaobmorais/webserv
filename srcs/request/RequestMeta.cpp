@@ -29,6 +29,15 @@ void	RequestMeta::setHost(const std::string& host)
 	this->_host = host;
 }
 
+void	RequestMeta::resetMeta(void)
+{
+	this->_contentLength = -1;
+	this->_chunked = false;
+	this->_connectionClose = false;
+	this->_expectContinue = true;
+	this->_host.clear();
+}
+
 int	RequestMeta::getContentLength(void) const { return (this->_contentLength); }
 
 bool	RequestMeta::isChunked(void) const { return (this->_chunked); }

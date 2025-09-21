@@ -35,6 +35,7 @@ class HttpResponse
 		void	appendBody(char c);
 		void	addHeader(const std::string& name, const std::string& value);
 		void	setChunked(bool chunked);
+		void	reset(void);
 
 		//getters
 		ResponseStatus::code		getStatusCode(void) const;

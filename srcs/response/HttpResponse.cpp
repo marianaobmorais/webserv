@@ -56,6 +56,16 @@ void	HttpResponse::setChunked(bool chunked)
 	this->_chunked = chunked;
 }
 
+void	HttpResponse::reset(void)
+{
+	this->_statusCode = ResponseStatus::OK;
+	this->_reasonPhrase.clear();
+	this->_version.clear();
+	this->_headers.clear();
+	this->_body.clear();
+	this->_chunked = false;
+}
+
 ResponseStatus::code	HttpResponse::getStatusCode() const
 {
 	return (this->_statusCode);

@@ -103,6 +103,27 @@ void	HttpRequest::setResolvedPath(const std::string path)
 	this->_resolvedPath = path;
 }
 
+void	HttpRequest::reset(void)
+{
+	this->_method = RequestMethod::INVALID;
+	this->_uri.clear();
+	this->_major = 0;
+	this->_minor = 0;
+	this->_headers.clear();
+	this->_meta.resetMeta();
+	this->_body.clear();
+	this->_parseError = ResponseStatus::OK;
+	this->_state = RequestState::RequestLine;
+	this->_route = RouteType::Error;
+	this->_rawRequest.clear();
+	this->_buffer.clear();
+	this->_chunkBuffer.clear();
+	this->_currentChunkSize = 0;
+	this->_parsingChunkSize = false;
+	this->_expectingChunkSeparator = false;
+	this->_resolvedPath.clear();
+}
+
 RequestMethod::Method	HttpRequest::getMethod(void) const
 {
 	return (this->_method);
