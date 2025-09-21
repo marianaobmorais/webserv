@@ -16,6 +16,9 @@
 class HttpRequest
 {
 	private:
+		HttpRequest& operator=(const HttpRequest& rhs); //blocked
+		HttpRequest(const HttpRequest& rhs); //blocked
+
 		RequestMethod::Method				_method;
 		std::string							_uri;
 		int									_major;
@@ -37,8 +40,6 @@ class HttpRequest
 	public:
 		HttpRequest();
 		~HttpRequest();
-		HttpRequest& operator=(const HttpRequest& rhs); //TODO
-		HttpRequest(const HttpRequest& rhs); //TODO
 
 		//setters
 		void	setMethod(const RequestMethod::Method& method);
@@ -62,7 +63,7 @@ class HttpRequest
 
 		//getters
 		RequestMethod::Method		getMethod(void) const;
-		const std::string			methodToString(RequestMethod::Method method) const;
+		const std::string			methodToString(void) const;
 		const std::string&			getUri(void) const;
 		const std::vector<int>		getHttpVersion(void) const;
 		const RequestMeta&			getMeta(void) const;
@@ -70,6 +71,7 @@ class HttpRequest
 		const std::string&			getBody(void) const;
 		ResponseStatus::code		getParseError(void) const;
 		const std::string&			getHeader(const std::string& name) const;
+		const std::map<std::string, std::string>&	getAllHeaders(void) const;
 		RequestState::state			getState(void) const;
 		RouteType::route			getRouteType(void) const;
 		std::string&				getRaw(void);

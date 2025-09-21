@@ -10,8 +10,10 @@
 class StaticPageHandler
 {
 	private:
-		StaticPageHandler();
-		~StaticPageHandler();
+		StaticPageHandler(); //blocked
+		~StaticPageHandler(); //blocked
+		StaticPageHandler& operator=(const StaticPageHandler& rhs); //blocked
+		StaticPageHandler(const StaticPageHandler& rhs); //blocked
 
 		static const std::string	detectMimeType(const std::string& resolvedPath);
 

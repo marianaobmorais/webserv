@@ -18,8 +18,8 @@ class HttpResponse
 		std::string							_body;
 		bool								_chunked; // transfer encoding
 
-		HttpResponse& operator=(const HttpResponse& rhs);
-		HttpResponse(const HttpResponse& rhs);
+		HttpResponse& operator=(const HttpResponse& rhs); //blocked
+		HttpResponse(const HttpResponse& rhs); //blocked
 
 		const std::string	statusCodeToString(const ResponseStatus::code& code);
 
