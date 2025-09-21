@@ -1,6 +1,7 @@
 #include <dispatcher/Dispatcher.hpp>
 #include <dispatcher/Router.hpp>
 #include <dispatcher/StaticPageHandler.hpp>
+#include <dispatcher/CgiHandler.hpp>
 #include <response/ResponseBuilder.hpp>
 #include <utils/Logger.hpp>
 #include <utils/string_utils.hpp>
@@ -25,7 +26,7 @@ void	Dispatcher::dispatch(ClientConnection& client)
 			StaticPageHandler::handle(req, res);
 			break ;
 		case RouteType::CGI:
-			//CgiHandler::handle();
+			CgiHandler::handle(req, res);
 			break ;
 		case RouteType::Error:
 		default:
