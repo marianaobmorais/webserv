@@ -62,6 +62,7 @@ class HttpRequest
 
 		//getters
 		RequestMethod::Method		getMethod(void) const;
+		const std::string			methodToString(RequestMethod::Method method) const;
 		const std::string&			getUri(void) const;
 		const std::vector<int>		getHttpVersion(void) const;
 		const RequestMeta&			getMeta(void) const;

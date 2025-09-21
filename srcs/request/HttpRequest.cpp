@@ -129,6 +129,33 @@ RequestMethod::Method	HttpRequest::getMethod(void) const
 	return (this->_method);
 }
 
+const std::string	HttpRequest::methodToString(RequestMethod::Method method) const
+{
+	switch (method)
+	{
+		case RequestMethod::GET:
+			return "GET";
+		case RequestMethod::HEAD:
+			return "HEAD";
+		case RequestMethod::POST:
+			return "POST";
+		case RequestMethod::PUT:
+			return "PUT";
+		case RequestMethod::DELETE:
+			return "DELETE";
+		case RequestMethod::TRACE:
+			return "TRACE";
+		case RequestMethod::CONNECT:
+			return "CONNECT";
+		case RequestMethod::PATCH:
+			return "PATCH";
+		case RequestMethod::INVALID:
+			return "INVALID";
+		default:
+			return "INVALID";
+	}
+}
+
 const std::string&	HttpRequest::getUri(void) const { return (this->_uri); }
 
 const std::vector<int>	HttpRequest::getHttpVersion(void) const
