@@ -18,11 +18,10 @@ class ResponseBuilder
 		static void					setMinimumHeaders(HttpResponse& response);
 		static std::string			errorPageGenerator(ResponseStatus::code code);
 
-		static void					handleCgiOutput(HttpResponse& response, const std::string& output);
-
 	public:
 		static const std::string	responseWriter(HttpResponse& response);
 		static void					build(HttpRequest& req, HttpResponse& res);
+		static void					handleCgiOutput(HttpResponse& response, const std::string& output);
 		static void					handleStaticPageOutput(HttpResponse& response,
 										const std::string output,
 										const std::string& mimeType);

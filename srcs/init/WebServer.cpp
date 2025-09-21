@@ -104,7 +104,7 @@ void	WebServer::sendResponse(size_t i)
 				client.setSentBytes(sent + static_cast<size_t>(bytesSent));
 				if (client.getSentBytes() == totalLen)
 				{
-					//client.clearBuffer(); //call _responseBuffer.clear()?
+					client.clearBuffer(); //call _responseBuffer.clear()?
 					client.setSentBytes(0);
 					this->_pollFDs[i].events = POLLIN; //After sending full response, switch back to POLLIN
 				}

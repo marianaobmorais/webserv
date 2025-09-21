@@ -129,9 +129,9 @@ RequestMethod::Method	HttpRequest::getMethod(void) const
 	return (this->_method);
 }
 
-const std::string	HttpRequest::methodToString(RequestMethod::Method method) const
+const std::string	HttpRequest::methodToString(void) const
 {
-	switch (method)
+	switch (this->_method)
 	{
 		case RequestMethod::GET:
 			return "GET";
@@ -173,6 +173,11 @@ const std::string& HttpRequest::getHeader(const std::string& name) const
 	if (c_it != this->_headers.end())
 		return (c_it->second);
 	return (name);
+}
+
+const std::map<std::string, std::string>&	HttpRequest::getAllHeaders(void) const
+{
+	return (this->_headers);
 }
 
 const RequestMeta&	HttpRequest::getMeta(void) const
