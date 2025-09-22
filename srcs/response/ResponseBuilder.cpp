@@ -127,11 +127,12 @@ void	ResponseBuilder::build(HttpRequest& req, HttpResponse& res)
 
 	setMinimumHeaders(res);
 
-	req.getMeta();
+	if (req.getMeta().isChunked())
+		res.addHeader("connection", "keep-live");
 
 	if (res.getStatusCode() >= 400)
 	{
-		res.addHeader("connection", "false");
+		res.addHeader("connection", "close");
 		std::string content;
 		//if (false) //find error in config
 		//{

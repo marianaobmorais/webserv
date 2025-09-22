@@ -25,6 +25,7 @@ class ServerConfig
 		//TODO client_max_body_size
 		//TODO return
 		bool						autoindex; //TODO
+		const std::string			upload_path;
 };
 
 #endif //SERVER_CONFIG_HPP
