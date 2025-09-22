@@ -106,19 +106,8 @@ bool Router::isStaticFile(const std::string& index, ResponseStatus::code& status
 		if (access(_resolvedPath.c_str(), R_OK) == 0)
 		{
 			req.setResolvedPath(_resolvedPath);
-			//TODO function
-			const std::string cgiExtensions[] = {".cgi", ".pl", ".py"}; //pode ter outras, config???
-			std::string::size_type dotPos = _resolvedPath.rfind('.');
-			if (dotPos != std::string::npos)
-			{
-				std::string ext = _resolvedPath.substr(dotPos);
-				std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-				for (size_t i = 0; i < sizeof(cgiExtensions)/sizeof(cgiExtensions[0]); ++i)
-				{
-					if (ext == cgiExtensions[i])
-						return (false);
-				}
-			}
+			if (hasCgiExtension(_resolvedPath))
+				return (false);
 			return (true);
 		}
 		else
@@ -131,7 +120,7 @@ bool Router::isStaticFile(const std::string& index, ResponseStatus::code& status
 		return (false); // não existe ou não é arquivo //try CGI
 }
 
-bool Router::isCgi(const std::string& cgiPath, const std::string resolvedPath, ResponseStatus::code& status)
+bool	Router::isCgi(const std::string& cgiPath, const std::string resolvedPath, ResponseStatus::code& status)
 {
 	std::string _resolvedPath = resolvedPath;
 	struct stat s;
@@ -153,12 +142,18 @@ bool Router::isCgi(const std::string& cgiPath, const std::string resolvedPath, R
 	if (_resolvedPath.find(cgiPath) != std::string::npos)
 		return (true);
 
-	// Verifica extensão para segurança
+	if (hasCgiExtension(resolvedPath))
+		return (true);
+	return (false);
+}
+
+bool	Router::hasCgiExtension(const std::string& path)
+{
 	const std::string cgiExtensions[] = {".cgi", ".pl", ".py"}; //pode ter outras, config???
-	std::string::size_type dotPos = _resolvedPath.rfind('.');
+	std::string::size_type dotPos = path.rfind('.');
 	if (dotPos != std::string::npos)
 	{
-		std::string ext = _resolvedPath.substr(dotPos);
+		std::string ext = path.substr(dotPos);
 		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 		for (size_t i = 0; i < sizeof(cgiExtensions)/sizeof(cgiExtensions[0]); ++i)
 		{

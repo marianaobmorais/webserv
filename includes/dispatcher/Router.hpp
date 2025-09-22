@@ -22,6 +22,7 @@ class Router
 		static bool	isCgi(const std::string& cgiPath,
 						const std::string resolvedPath,
 						ResponseStatus::code& status);
+		static bool	hasCgiExtension(const std::string& path);
 
 	public:
 		static void	resolve(HttpRequest& request, HttpResponse& response);
