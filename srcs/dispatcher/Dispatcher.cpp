@@ -13,7 +13,7 @@ void	Dispatcher::dispatch(ClientConnection& client)
 	HttpRequest& req = client.getRequest();
 	HttpResponse& res = client.getResponse();
 
-	Router::resolve(req, res);
+	Router::resolve(req, res); //TODO query string
 
 	Logger::instance().log(DEBUG,
 		"StaticPageHandler::handle Route -> " + toString(req.getRouteType()));
