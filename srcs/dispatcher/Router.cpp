@@ -106,6 +106,19 @@ bool Router::isStaticFile(const std::string& index, ResponseStatus::code& status
 		if (access(_resolvedPath.c_str(), R_OK) == 0)
 		{
 			req.setResolvedPath(_resolvedPath);
+			//TODO function
+			const std::string cgiExtensions[] = {".cgi", ".pl", ".py"}; //pode ter outras, config???
+			std::string::size_type dotPos = _resolvedPath.rfind('.');
+			if (dotPos != std::string::npos)
+			{
+				std::string ext = _resolvedPath.substr(dotPos);
+				std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+				for (size_t i = 0; i < sizeof(cgiExtensions)/sizeof(cgiExtensions[0]); ++i)
+				{
+					if (ext == cgiExtensions[i])
+						return (false);
+				}
+			}
 			return (true);
 		}
 		else
@@ -125,7 +138,7 @@ bool Router::isCgi(const std::string& cgiPath, const std::string resolvedPath, R
 
 	if (stat(_resolvedPath.c_str(), &s) != 0 || !S_ISREG(s.st_mode))
 	{
-		status = ResponseStatus::NotFound;
+		//status = ResponseStatus::NotFound;
 		return (false);
 	}
 

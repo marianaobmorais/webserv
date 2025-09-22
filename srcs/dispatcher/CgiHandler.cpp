@@ -200,4 +200,5 @@ void	CgiHandler::handle(HttpRequest &request, HttpResponse& response)
 
 		ResponseBuilder::handleCgiOutput(response, output);
 	}
+	Logger::instance().log(DEBUG, "[Finished] CgiHandler::handle");
 }
