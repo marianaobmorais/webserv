@@ -21,6 +21,7 @@ class HttpRequest
 
 		RequestMethod::Method				_method;
 		std::string							_uri;
+		std::string							_queryString;
 		int									_major;
 		int									_minor;
 		std::map<std::string, std::string>	_headers;
@@ -44,6 +45,7 @@ class HttpRequest
 		//setters
 		void	setMethod(const RequestMethod::Method& method);
 		void	setUri(const std::string& uri);
+		void	setQueryString(const std::string queryString);
 		void	setMajor(int major);
 		void	setMinor(int minor);
 		void	appendBody(const std::string& body);
@@ -65,6 +67,7 @@ class HttpRequest
 		RequestMethod::Method		getMethod(void) const;
 		const std::string			methodToString(void) const;
 		const std::string&			getUri(void) const;
+		const std::string&			getQueryString(void) const;
 		const std::vector<int>		getHttpVersion(void) const;
 		const RequestMeta&			getMeta(void) const;
 		RequestMeta&				getMeta(void);

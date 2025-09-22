@@ -4,6 +4,7 @@
 #include <request/RequestParse.hpp>
 #include <request/RequestState.hpp>
 #include <utils/string_utils.hpp>
+#include <utils/Logger.hpp>
 #include <response/ResponseStatus.hpp>
 
 void	RequestParse::handleRawRequest(const std::string& chunk, HttpRequest& request)
@@ -84,7 +85,7 @@ void	RequestParse::requestLine(const std::string& buffer, HttpRequest& request)
 	}
 
 	method(tokens[0], request);
-	request.setUri(tokens[1]);
+	uri(tokens[1], request);
 
 	const std::string version = tokens[2];
 	if (version.size() < 8 || version.substr(0, 5) != "HTTP/"
@@ -127,6 +128,16 @@ void	RequestParse::method(const std::string& method, HttpRequest& request)
 		request.setMethod(RequestMethod::INVALID);
 		request.setParseError(ResponseStatus::MethodNotAllowed);
 	}
+}
+
+void	RequestParse::uri(const std::string str, HttpRequest& request)
+{
+	std::string uri = str;
+	std::string::size_type queryPos = uri.find('?');
+	if (queryPos != std::string::npos)
+		uri = str.substr(0, queryPos);
+	request.setUri(uri);
+	request.setQueryString(extractQueryString(str));
 }
 
 void	RequestParse::headers(const std::string& buffer, HttpRequest& request)
@@ -235,4 +246,17 @@ void	RequestParse::bodyChunked(char c, HttpRequest& request)
 		request.clearChunkBuffer();
 		request.setExpectingChunkSeparator(true);
 	}
+}
+
+std::string	RequestParse::extractQueryString(const std::string uri)
+{
+	std::string::size_type query_pos = uri.find('?');
+	if (query_pos != std::string::npos)
+	{
+		return uri.substr(query_pos + 1);
+		uri.substr(0, query_pos);
+	}
+	else
+	{
+		return "";}
 }

@@ -3,19 +3,6 @@
 #include <utils/Logger.hpp>
 #include <response/ResponseBuilder.hpp>
 
-std::string	CgiHandler::extractQueryString(std::string uri)
-{
-	std::string::size_type query_pos = uri.find('?');
-	if (query_pos != std::string::npos)
-	{
-		return uri.substr(query_pos + 1);
-		uri.substr(0, query_pos);
-	}
-	else
-	{
-		return "";}
-	}
-	
 std::string	CgiHandler::extractScriptName(const std::string& resolvedPath)
 {
 	std::string::size_type lastSlash = resolvedPath.find_last_of("/");
@@ -45,7 +32,7 @@ char**	CgiHandler::buildEnvp(HttpRequest& request)
 	std::vector<std::string> env;
 
 	env.push_back("REQUEST_METHOD=" + request.methodToString());
-	env.push_back("QUERY_STRING=" + extractQueryString(request.getUri()));
+	env.push_back("QUERY_STRING=" + request.getQueryString());
 
 	std::string contentType = request.getHeader("Content-Type");
 	if (contentType != "Content-Type")

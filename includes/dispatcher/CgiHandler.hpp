@@ -21,7 +21,6 @@ class CgiHandler
 		CgiHandler(const CgiHandler& rhs); //blocked
 		CgiHandler& operator=(const CgiHandler& rhs); //blocked
 
-		static std::string	extractQueryString(std::string uri);
 		static std::string	extractScriptName(const std::string& resolvedPath);
 		static std::string	extractPathInfo(const std::string& uri, const std::string& scriptName);
 

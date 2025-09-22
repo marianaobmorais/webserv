@@ -23,6 +23,8 @@ void	HttpRequest::setMethod(const RequestMethod::Method& method)
 
 void	HttpRequest::setUri(const std::string& uri) { this->_uri = uri; }
 
+void	HttpRequest::setQueryString(const std::string queryString) { this->_queryString = queryString; }
+
 void	HttpRequest::setMajor(int major) { this->_major = major; }
 
 void	HttpRequest::setMinor(int minor) { this->_minor = minor; }
@@ -157,6 +159,8 @@ const std::string	HttpRequest::methodToString(void) const
 }
 
 const std::string&	HttpRequest::getUri(void) const { return (this->_uri); }
+
+const std::string&	HttpRequest::getQueryString(void) const { return (this->_queryString); }
 
 const std::vector<int>	HttpRequest::getHttpVersion(void) const
 {
