@@ -2,7 +2,7 @@
 
 ServerConfig::ServerConfig() : root("/home/jose/webserv_42/webservinho_app"),
 	index("index.html"),
-	cgiPath("/usr/bin/python3"),
+	cgiPath("/home/jose/webserv_42/webservinho_app/cgi-bin"),
 	error_page_404("errors/404.html"),
 	autoindex(true)
 {}
