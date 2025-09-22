@@ -2,7 +2,9 @@ NAME = webserv
 
 REQUEST_PATH = srcs/request
 RESPONSE_PATH = srcs/response
+DISPATCHER_PATH = srcs/dispatcher
 UTILS_PATH = srcs/utils
+INIT_PATH = srcs/init
 
 SRCS = srcs/main.cpp \
 	$(REQUEST_PATH)/HttpRequest.cpp \
@@ -10,28 +12,34 @@ SRCS = srcs/main.cpp \
 	$(REQUEST_PATH)/RequestParse.cpp \
 	$(RESPONSE_PATH)/HttpResponse.cpp \
 	$(RESPONSE_PATH)/ResponseBuilder.cpp \
+	$(DISPATCHER_PATH)/Router.cpp \
+	$(DISPATCHER_PATH)/Dispatcher.cpp \
+	$(DISPATCHER_PATH)/StaticPageHandler.cpp \
+	$(DISPATCHER_PATH)/CgiHandler.cpp \
 	$(UTILS_PATH)/Logger.cpp \
-	srcs/WebServer.cpp \
-	srcs/ServerSocket.cpp \
-	srcs/ClientConnection.cpp \
+	$(INIT_PATH)/WebServer.cpp \
+	$(INIT_PATH)/ServerSocket.cpp \
+	$(INIT_PATH)/ClientConnection.cpp \
+	$(INIT_PATH)/ServerConfig.cpp \
 
-#OBJS = $(SRCS:.cpp=.o) #it does't compile with OBJS
+OBJS_DIR = objs
+OBJS = $(SRCS:srcs/%.cpp=$(OBJS_DIR)/%.o)
 
 #add logs folder
-#add objs folder
 
 CXX = c++
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g
+CXXFLAGS = -Wall -Werror -Wextra -std=c++98 -g -I./includes -DDEV=1
 
 RM = rm -f
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -DDEV=1 -I./includes $(SRCS) -o $(NAME)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 all: $(NAME)
 
-#%.o: %.cpp
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(OBJS_DIR)/%.o: srcs/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	$(RM) $(OBJS)

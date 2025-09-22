@@ -34,7 +34,11 @@ class ClientConnection
 		std::string const&	getRequestBuffer(void) const;
 		std::string /* const& */	getResponseBuffer(void) /* const */;
 		void				setSentBytes(size_t bytes);
-		void				setResponseBuffer(std::string buffer);
+		void				setResponseBuffer(const std::string buffer);
+
+		//:D
+		HttpRequest&	getRequest(void);
+		HttpResponse&	getResponse(void);
 };
 
 #endif //CLIENTCONNECTION_HPP

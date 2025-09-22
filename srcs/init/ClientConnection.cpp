@@ -1,6 +1,7 @@
 #include <init/ClientConnection.hpp>
 #include <request/RequestParse.hpp>
 #include <response/ResponseBuilder.hpp> // response
+#include <utils/string_utils.hpp>
 #include <utils/Logger.hpp>
 #include <unistd.h> //close()
 #include <sys/socket.h>
@@ -12,7 +13,7 @@
 
 ClientConnection::ClientConnection(int fd) : _fd(fd), _sentBytes(0)
 {
-	//this->_httpResponse.setStatusCode(ResponseStatus::NotFound);
+
 }
 
 ClientConnection::ClientConnection(ClientConnection const& src) : _fd(src._fd) {}
@@ -38,7 +39,7 @@ ssize_t	ClientConnection::recvData(void)
 	{
 		_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
 		std::cout << _requestBuffer << std::endl; //debug
-		RequestParse::handleRawRequest(buffer, _httpRequest); //not working properly
+		RequestParse::handleRawRequest(buffer, _httpRequest);
 		return (bytesRecv);
 	}
 	if (bytesRecv == 0)
@@ -68,8 +69,8 @@ bool	ClientConnection::completedRequest(void)
 	if (_httpRequest.getState() == RequestState::Complete)
 	{
 		Logger::instance().log(DEBUG, "Request completed");
-		ResponseBuilder::run(this->_httpResponse); //test
-		setResponseBuffer( ResponseBuilder::responseToString(this->_httpResponse)); //test
+		Logger::instance().log(DEBUG,
+			"Request completed ParseError ->" + toString(_httpRequest.getParseError()));
 		return (true);
 	}
 	Logger::instance().log(DEBUG, "Request not completed");
@@ -103,8 +104,6 @@ std::string const&	ClientConnection::getRequestBuffer(void) const
 
 std::string /* const& */	ClientConnection::getResponseBuffer(void) //const
 {
-	std::cout << "this->_httpResponse: >>>>>" << ResponseBuilder::responseToString(this->_httpResponse) << "<<<<<" <<std::endl;
-	//return (ResponseBuilder::responseToString(this->_httpResponse));
 	return (_responseBuffer);
 }
 
@@ -113,8 +112,10 @@ void		ClientConnection::setSentBytes(size_t bytes)
 	this->_sentBytes = bytes;
 }
 
-void	ClientConnection::setResponseBuffer(std::string buffer)
+void	ClientConnection::setResponseBuffer(const std::string buffer)
 {
 	this->_responseBuffer = buffer;
 }
 
+HttpRequest&	ClientConnection::getRequest(void) {return this->_httpRequest;}
+HttpResponse&	ClientConnection::getResponse(void) {return this->_httpResponse;}

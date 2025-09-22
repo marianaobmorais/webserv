@@ -25,6 +25,7 @@ class RequestMeta
 		void	setConnectionClose(bool connection_close);
 		void	setExpectContinue(bool expect_continue);
 		void	setHost(const std::string& host);
+		void	resetMeta(void);
 
 		//getters
 		int			getContentLength(void) const;

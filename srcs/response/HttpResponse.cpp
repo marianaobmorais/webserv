@@ -2,7 +2,7 @@
 
 HttpResponse::HttpResponse()
 {
-	setStatusCode(ResponseStatus::NotFound);
+	setStatusCode(ResponseStatus::OK);
 	setVersion("1.1");
 	setChunked(false);
 }
@@ -54,6 +54,16 @@ void	HttpResponse::addHeader(const std::string& name, const std::string& value)
 void	HttpResponse::setChunked(bool chunked)
 {
 	this->_chunked = chunked;
+}
+
+void	HttpResponse::reset(void)
+{
+	this->_statusCode = ResponseStatus::OK;
+	this->_reasonPhrase.clear();
+	this->_version.clear();
+	this->_headers.clear();
+	this->_body.clear();
+	this->_chunked = false;
 }
 
 ResponseStatus::code	HttpResponse::getStatusCode() const

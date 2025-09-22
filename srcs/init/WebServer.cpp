@@ -1,5 +1,6 @@
 #include <init/WebServer.hpp>
-#include <response/ResponseBuilder.hpp>
+#include <dispatcher/Dispatcher.hpp>
+#include <utils/Logger.hpp>
 #include <sys/socket.h> // SOMAXCONN
 #include <unistd.h> //close()
 #include <errno.h>
@@ -62,6 +63,7 @@ void	WebServer::receiveRequest(size_t i)
 				// 	"\r\n"
 				// 	"Hello World!"; //debug
 				//client.setResponseBuffer(response);
+				Dispatcher::dispatch(client); //real oficial
 				client.clearBuffer(); //rename
 				this->_pollFDs[i].events = POLLOUT; //After receiving a full request, switch events to POLLOUT
 				client.setSentBytes(0);
@@ -79,6 +81,7 @@ void	WebServer::receiveRequest(size_t i)
 
 void	WebServer::sendResponse(size_t i)
 {
+	Logger::instance().log(DEBUG, "[Started] WebServer::sendResponse");
 	std::map<int, ClientConnection>::iterator	it;
 	it = this->_clients.find(this->_pollFDs[i].fd);
 	std::cout << "Response: fd: " << this->_pollFDs[i].fd << std::endl; //debug
@@ -103,7 +106,7 @@ void	WebServer::sendResponse(size_t i)
 				client.setSentBytes(sent + static_cast<size_t>(bytesSent));
 				if (client.getSentBytes() == totalLen)
 				{
-					//client.clearBuffer(); //call _responseBuffer.clear()?
+					client.clearBuffer(); //call _responseBuffer.clear()?
 					client.setSentBytes(0);
 					this->_pollFDs[i].events = POLLIN; //After sending full response, switch back to POLLIN
 				}
@@ -117,6 +120,7 @@ void	WebServer::sendResponse(size_t i)
 			this->removeClientConnection(client.getFD(), i);
 		}
 	}
+	Logger::instance().log(DEBUG, "[Finished] WebServer::sendResponse");
 }
 
 void	WebServer::removeClientConnection(int clientFD, size_t pollFDIndex)
@@ -150,13 +154,16 @@ static int	getPollTimeout(bool CGI) //refactor later
 
 void	WebServer::runServer(void)
 {
+	Logger::instance().log(DEBUG, "[Started] WebServer::runServer");
 	while (true)
 	{
+		//Logger::instance().log(DEBUG, "WebServer::runServer started loop");
 		int timeout = getPollTimeout(false); //update poll() timeout parameter accordingly to the presence of CGI process
 		int	ready = ::poll(&this->_pollFDs[0], this->_pollFDs.size(), timeout);
 
 		if (ready == -1) //error
 		{
+			Logger::instance().log(ERROR, "WebServer::runServer -> ready == -1");
 			if (errno == EINTR) //"harmless/temporary error"?
 				continue ;
 			std::string	errorMsg(strerror(errno));
@@ -164,6 +171,7 @@ void	WebServer::runServer(void)
 		}
 		if (ready == 0) //poll timed out
 		{
+			Logger::instance().log(ERROR, "WebServer::runServer -> poll timed out");
 			; //TODO //Check how long each CGI process has been running, remove zombie processes
 		}
 
@@ -172,20 +180,28 @@ void	WebServer::runServer(void)
 			if (this->_pollFDs[i].revents & POLLIN) //check if POLLIN bit is set, regardless of what other bits may also be set
 			{
 				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
+				{
+					Logger::instance().log(DEBUG, "WebServer::runServer -> queue");
 					this->queueClientConnections();
+				}
 				else //If it wasn’t the server socket, then it must be one of the client sockets
+				{
+					Logger::instance().log(DEBUG, "WebServer::runServer -> receive");
 					this->receiveRequest(i);
+				}
 			}
 			else if (_pollFDs[i].revents & POLLOUT)
 				this->sendResponse(i);
 			else if (this->_pollFDs[i].revents & (POLLERR | POLLHUP)) //POLLNVAL?
 			{
-				std::cout << "removing client..." << std::endl;
+				Logger::instance().log(DEBUG, "WebServer::runServer -> removing client...");
 				std::map<int, ClientConnection>::iterator	it;
 				it = this->_clients.find(this->_pollFDs[i].fd);
 				if (it != this->_clients.end())
 					this->removeClientConnection(it->second.getFD(), i);
 			}
 		}
+		//Logger::instance().log(DEBUG, "WebServer::runServer finished loop");
 	}
+	Logger::instance().log(DEBUG, "[Finished] WebServer::runServer");
 }

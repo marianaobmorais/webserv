@@ -3,7 +3,7 @@
 HttpRequest::HttpRequest()
 {
 	setMethod(RequestMethod::INVALID);
-	setParseError(RequestParseError::OK);
+	setParseError(ResponseStatus::OK);
 	getMeta().setContentLength(-1);
 	getMeta().setChunked(false);
 	getMeta().setConnectionClose(false);
@@ -22,6 +22,8 @@ void	HttpRequest::setMethod(const RequestMethod::Method& method)
 }
 
 void	HttpRequest::setUri(const std::string& uri) { this->_uri = uri; }
+
+void	HttpRequest::setQueryString(const std::string queryString) { this->_queryString = queryString; }
 
 void	HttpRequest::setMajor(int major) { this->_major = major; }
 
@@ -53,7 +55,7 @@ void	HttpRequest::appendBody(char c)
 	this->_body.push_back(c);
 }
 
-void	HttpRequest::setParseError(RequestParseError::reason reason)
+void	HttpRequest::setParseError(ResponseStatus::code reason)
 {
 	this->_parseError = reason;
 }
@@ -61,6 +63,11 @@ void	HttpRequest::setParseError(RequestParseError::reason reason)
 void	HttpRequest::setRequestState(RequestState::state state)
 {
 	this->_state = state;
+}
+
+void	HttpRequest::setRouteType(RouteType::route route)
+{
+	this->_route = route;
 }
 
 void	HttpRequest::appendRaw(const std::string& chunk)
@@ -93,12 +100,67 @@ void	HttpRequest::setExpectingChunkSeparator(bool value)
 	this->_expectingChunkSeparator = value;
 }
 
+void	HttpRequest::setResolvedPath(const std::string path)
+{
+	this->_resolvedPath = path;
+}
+
+void	HttpRequest::reset(void)
+{
+	this->_method = RequestMethod::INVALID;
+	this->_uri.clear();
+	this->_major = 0;
+	this->_minor = 0;
+	this->_headers.clear();
+	this->_meta.resetMeta();
+	this->_body.clear();
+	this->_parseError = ResponseStatus::OK;
+	this->_state = RequestState::RequestLine;
+	this->_route = RouteType::Error;
+	this->_rawRequest.clear();
+	this->_buffer.clear();
+	this->_chunkBuffer.clear();
+	this->_currentChunkSize = 0;
+	this->_parsingChunkSize = false;
+	this->_expectingChunkSeparator = false;
+	this->_resolvedPath.clear();
+}
+
 RequestMethod::Method	HttpRequest::getMethod(void) const
 {
 	return (this->_method);
 }
 
+const std::string	HttpRequest::methodToString(void) const
+{
+	switch (this->_method)
+	{
+		case RequestMethod::GET:
+			return "GET";
+		case RequestMethod::HEAD:
+			return "HEAD";
+		case RequestMethod::POST:
+			return "POST";
+		case RequestMethod::PUT:
+			return "PUT";
+		case RequestMethod::DELETE:
+			return "DELETE";
+		case RequestMethod::TRACE:
+			return "TRACE";
+		case RequestMethod::CONNECT:
+			return "CONNECT";
+		case RequestMethod::PATCH:
+			return "PATCH";
+		case RequestMethod::INVALID:
+			return "INVALID";
+		default:
+			return "INVALID";
+	}
+}
+
 const std::string&	HttpRequest::getUri(void) const { return (this->_uri); }
+
+const std::string&	HttpRequest::getQueryString(void) const { return (this->_queryString); }
 
 const std::vector<int>	HttpRequest::getHttpVersion(void) const
 {
@@ -117,6 +179,11 @@ const std::string& HttpRequest::getHeader(const std::string& name) const
 	return (name);
 }
 
+const std::map<std::string, std::string>&	HttpRequest::getAllHeaders(void) const
+{
+	return (this->_headers);
+}
+
 const RequestMeta&	HttpRequest::getMeta(void) const
 {
 	return (this->_meta);
@@ -131,7 +198,7 @@ const std::string&	HttpRequest::getBody(void) const
 	return (this->_body);
 }
 
-RequestParseError::reason	HttpRequest::getParseError(void) const
+ResponseStatus::code	HttpRequest::getParseError(void) const
 {
 	return (this->_parseError);
 }
@@ -139,6 +206,11 @@ RequestParseError::reason	HttpRequest::getParseError(void) const
 RequestState::state	HttpRequest::getState(void) const
 {
 	return (this->_state);
+}
+
+RouteType::route	HttpRequest::getRouteType(void) const
+{
+	return (this->_route);
 }
 
 std::string&	HttpRequest::getRaw(void)
@@ -169,4 +241,9 @@ bool	HttpRequest::isParsingChunkSize(void) const
 bool	HttpRequest::isExpectingChunkSeparator(void) const
 {
 	return (this->_expectingChunkSeparator);
+}
+
+const std::string	HttpRequest::getResolvedPath(void) const
+{
+	return (this->_resolvedPath);
 }
