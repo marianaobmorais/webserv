@@ -11,7 +11,8 @@ class Config;
 class WebServer
 {
 	private:
-		std::vector<ServerConfig>		_config;
+		//std::vector<ServerConfig>		_config;
+		Config const&					_config;
 		std::map<int, size_t>			_FDToConfig; // FD to index in _config
 		//std::vector<ServerSocket>		_serverSocket;
 
