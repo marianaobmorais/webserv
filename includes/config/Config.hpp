@@ -16,6 +16,8 @@ class Config
 
 		//accessors
 		std::vector<ServerConfig> const&	getServerConfig(void) const;
+
+		//global settings (timeouts, worker count, CGI config, etc.)?
 };
 
 #endif //CONFIG_HPP

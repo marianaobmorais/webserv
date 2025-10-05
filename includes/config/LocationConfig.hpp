@@ -10,7 +10,7 @@ class LocationConfig
 		std::string					_path;
 		// std::string					_root; //A location block root can override ServerRoot for a specific path
 		// bool						_autoIndex;
-		// std::vector<std::string>	_methods;
+		// std::vector<std::string>	_methods; //can override server-level defaults
 	public:
 		//accessors
 };

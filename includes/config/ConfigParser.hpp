@@ -12,7 +12,7 @@ class ConfigParser
 		ConfigParser&		operator=(ConfigParser const& rhs);
 		~ConfigParser(void);
 	public:
-		static Config		parseFile(std::string const& configFile); //populates the Config::_servers vector
+		static Config		parseFile(std::string const& configFile); //populates the Config::_servers vector //dont allow port duplicates
 };
 
 #endif //CONFIGPARSER_H
