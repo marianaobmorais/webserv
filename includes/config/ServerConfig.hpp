@@ -8,8 +8,9 @@
 class ServerConfig
 {
 	private:
-		std::vector<int>			_listenPort; //In Nginx-like configs, a server block can listen on multiple ports or IPs
-		std::string					_serverName;
+		std::string					_listenPort;
+		//std::vector<int>			_listenPort; //In Nginx-like configs, a server block can listen on multiple ports or IPs
+		std::string					_serverName; // "example.com" -> same as hostname?
 		std::string					_root; //The server block root sets the document root for the whole server
 		std::vector<LocationConfig>	_locations;
 
@@ -20,6 +21,7 @@ class ServerConfig
 		~ServerConfig(void);
 
 		//accessors
+		std::string const&			getListenPort(void) const;
 };
 
 #endif //SERVERCONFIG_HPP
