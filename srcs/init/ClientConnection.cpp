@@ -34,6 +34,11 @@ ssize_t	ClientConnection::recvData(void)
 	ssize_t	bytesRecv;
 
 	bytesRecv = ::recv(this->_fd, buffer, sizeof(buffer), 0);
+	if (bytesRecv == -1)
+	{
+		std::string	errorMsg(strerror(errno));
+		throw std::runtime_error("error: recv: " + errorMsg);
+	}
 	if (bytesRecv > 0)
 	{
 		_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
@@ -43,8 +48,6 @@ ssize_t	ClientConnection::recvData(void)
 	}
 	if (bytesRecv == 0)
 		return (0);
-	std::string	errorMsg(strerror(errno));
-	throw std::runtime_error("error: recv: " + errorMsg);
 }
 
 ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t toSend)
@@ -57,10 +60,13 @@ ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t
 	ssize_t	bytesSent;
 
 	bytesSent = send(client.getFD(), client.getResponseBuffer().c_str() + sent, toSend, 0);
+	if (bytesSent == -1)
+	{
+		std::string	errorMsg(strerror(errno));
+		throw	std::runtime_error("error: send: " + errorMsg);
+	}
 	if (bytesSent >= 0)
 		return (bytesSent);
-	std::string	errorMsg(strerror(errno));
-	throw	std::runtime_error("error: send: " + errorMsg);
 }
 
 bool	ClientConnection::completedRequest(void)
