@@ -6,6 +6,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 
 WebServer::WebServer(Config const& config) : _config(config), _serverSocket() {}
 
@@ -13,17 +14,22 @@ WebServer::~WebServer(void){}
 
 void	WebServer::startServer(void)
 {
-	this->_serverSocket.startSocket("8080"); //this parameter will be from config file
-	this->_serverSocket.listenConnections(SOMAXCONN);
+	for (size_t i = 0; i < this->_config.getServerConfig().size(); i++)
+	{
+		ServerSocket	tmpSocket;
 
-	//start _pollFDs vector
-	// the server's listening socket will be the first ones, the client ones will start after adding the sockt fds
-	this->addToPollFD(this->_serverSocket.getFD(), POLLIN); // monitor for incoming connections
+		tmpSocket.startSocket(this->_config.getServerConfig()[i].getListenPort());
+		tmpSocket.listenConnections(SOMAXCONN);
+
+		this->_SocketToServerIndex[tmpSocket.getFD()] = i; //index in config's ServerConfig vector
+		this->_serverSocket.push_back(tmpSocket); //index in ServerSocket is equal to index in config's ServerConfig vector
+		this->addToPollFD(tmpSocket.getFD(), POLLIN); // monitor for incoming connections
+	}
 }
 
-void	WebServer::queueClientConnections(void)
+void	WebServer::queueClientConnections(ServerSocket &socket)
 {
-	std::vector<int>	newFDs = this->_serverSocket.acceptConnections(); //accepts the connections
+	std::vector<int>	newFDs = socket.acceptConnections(); //accepts the connections
 	for (size_t j = 0; j < newFDs.size(); j++)
 	{
 		int	newClientFD = newFDs[j];
@@ -31,7 +37,8 @@ void	WebServer::queueClientConnections(void)
 		{
 			//std::cout << "queueClientConnections: fd: " << newFDs[j] << std::endl; //debug
 			//new client connection
-			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD)));
+			size_t	ServerIndex = this->_SocketToServerIndex[socket.getFD()]; // get config index for this listening socket
+			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD, ServerIndex)));
 
 			//Add to pollFDs //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
 			this->addToPollFD(newClientFD, POLLIN);
@@ -43,7 +50,7 @@ void	WebServer::receiveRequest(size_t i)
 {
 	std::map<int, ClientConnection>::iterator	it;
 	it = this->_clients.find(this->_pollFDs[i].fd);
-	if (it != this->_clients.end()) //should I treat it in case of false?
+	if (it != this->_clients.end()) //found client
 	{
 		ClientConnection	&client = it->second;
 		try
@@ -63,6 +70,7 @@ void	WebServer::receiveRequest(size_t i)
 				client.setResponseBuffer(response);
 				client.clearBuffer(); //rename
 				this->_pollFDs[i].events = POLLOUT; //After receiving a full request, switch events to POLLOUT
+				this->_pollFDs[i].revents = 0;
 				client.setSentBytes(0);
 			}
 			else if (bytesRecv == 0)
@@ -80,7 +88,7 @@ void	WebServer::sendResponse(size_t i)
 {
 	std::map<int, ClientConnection>::iterator	it;
 	it = this->_clients.find(this->_pollFDs[i].fd);
-	std::cout << "Response: fd: " << this->_pollFDs[i].fd << std::endl; //debug
+	//std::cout << "Response: fd: " << this->_pollFDs[i].fd << std::endl; //debug
 	if (it != this->_clients.end()) //should I treat it in case of false?
 	{
 		ClientConnection	&client = it->second;
@@ -93,8 +101,7 @@ void	WebServer::sendResponse(size_t i)
 			if (!toSend)
 			{
 				this->_pollFDs[i].events = POLLIN;
-				//set revents to 0 too?
-				return ; //not sure?
+				return ;
 			}
 			ssize_t	bytesSent = client.sendData(client, sent, toSend);
 			if (bytesSent > 0)
@@ -105,10 +112,11 @@ void	WebServer::sendResponse(size_t i)
 					//client.clearBuffer(); //call _responseBuffer.clear()?
 					client.setSentBytes(0);
 					this->_pollFDs[i].events = POLLIN; //After sending full response, switch back to POLLIN
+					this->_pollFDs[i].revents = 0;
 				}
 			}
-			else if (bytesSent == -1)
-				return ;
+			else if (bytesSent == -1) //Checking the value of errno to adjust the server behaviour is strictly forbidden after performing a read or write operation.
+				return ; //should I thorw exception
 		}
 		catch (std::exception const& e)
 		{
@@ -171,9 +179,11 @@ void	WebServer::runServer(void)
 		{
 			if (this->_pollFDs[i].revents & POLLIN) //check if POLLIN bit is set, regardless of what other bits may also be set
 			{
-				if (this->_pollFDs[i].fd == this->_serverSocket.getFD()) // Ready on listening socket -> accept new client
-					this->queueClientConnections();
-				else //If it wasn’t the server socket, then it must be one of the client sockets
+				//With multiple servers, you need to check if the fd matches any of your server sockets
+				std::map<int, size_t>::iterator it = _SocketToServerIndex.find(_pollFDs[i].fd);
+				if (it != _SocketToServerIndex.end()) // Ready on listening socket -> accept new client
+					this->queueClientConnections(this->_serverSocket[it->second]);
+				else
 					this->receiveRequest(i);
 			}
 			else if (_pollFDs[i].revents & POLLOUT)
