@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string>
 
-ClientConnection::ClientConnection(int fd, size_t serverIndex) : _fd(fd), _serverIndex(serverIndex), _sentBytes(0)
+ClientConnection::ClientConnection(int fd, ServerConfig const& config) : _fd(fd), _serverConfig(&config), _sentBytes(0)
 {
 	this->_httpResponse.setStatusCode(ResponseStatus::NotFound);
 }
@@ -110,11 +110,10 @@ std::string const&	ClientConnection::getResponseBuffer(void) const
 	return (_responseBuffer);
 }
 
-size_t const&	ClientConnection::getServerIndex(void) const
+ServerConfig const&	ClientConnection::getServerConfig(void) const
 {
-	return (this->_serverIndex);
+	return (*this->_serverConfig);
 }
-
 
 void		ClientConnection::setSentBytes(size_t bytes)
 {

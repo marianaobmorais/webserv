@@ -37,8 +37,9 @@ void	WebServer::queueClientConnections(ServerSocket &socket)
 		{
 			//std::cout << "queueClientConnections: fd: " << newFDs[j] << std::endl; //debug
 			//new client connection
-			size_t	ServerIndex = this->_SocketToServerIndex[socket.getFD()]; // get config index for this listening socket
-			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD, ServerIndex)));
+			size_t	serverIndex = this->_SocketToServerIndex[socket.getFD()]; // get config index for this listening socket
+			ServerConfig const& config = this->_config.getServerConfig()[serverIndex]; //get the config of this index
+			this->_clients.insert(std::make_pair(newClientFD, ClientConnection(newClientFD, config)));
 
 			//Add to pollFDs //adds the client’s file descriptor to _pollFDs so poll() will also monitor it
 			this->addToPollFD(newClientFD, POLLIN);

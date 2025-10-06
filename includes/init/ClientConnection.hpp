@@ -6,11 +6,12 @@
 #include <request/HttpRequest.hpp>
 #include <response/HttpResponse.hpp>
 
+class ServerConfig;
 class ClientConnection
 {
 	private:
 		int					_fd;
-		size_t				_serverIndex;
+		ServerConfig const*	_serverConfig;
 		std::string			_requestBuffer;
 		std::string			_responseBuffer;
 		size_t				_sentBytes;
@@ -20,7 +21,7 @@ class ClientConnection
 
 		ClientConnection&	operator=(ClientConnection const& rhs); //memmove?
 	public:
-		ClientConnection(int fd, size_t serverIndex);
+		ClientConnection(int fd, ServerConfig const& config);
 		ClientConnection(ClientConnection const& src); //memmove?
 		~ClientConnection(void);
 
@@ -35,7 +36,7 @@ class ClientConnection
 		size_t const&		getSentBytes(void) const;
 		std::string const&	getRequestBuffer(void) const;
 		std::string const&	getResponseBuffer(void) const;
-		size_t const&		getServerIndex(void) const;
+		ServerConfig const&	getServerConfig(void) const;
 		void				setSentBytes(size_t bytes);
 		void				setResponseBuffer(std::string buffer);
 };
