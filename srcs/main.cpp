@@ -17,7 +17,7 @@ int	main(int argc, char** argv)
 		return (1);
 	}
 	if (argc == 1)
-		configFile = "defaut.config"; //create file and put it in the repository?
+		configFile = "default.conf"; //create file and put it in the repository?
 	if (argc == 2)
 		configFile = argv[1];
 	try
