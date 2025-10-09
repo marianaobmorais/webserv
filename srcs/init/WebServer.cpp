@@ -191,7 +191,7 @@ void	WebServer::runServer(void)
 				this->sendResponse(i);
 			else if (this->_pollFDs[i].revents & (POLLERR | POLLHUP)) //POLLNVAL?
 			{
-				std::cout << "removing client..." << std::endl;
+				//std::cout << "removing client..." << std::endl;
 				std::map<int, ClientConnection>::iterator	it;
 				it = this->_clients.find(this->_pollFDs[i].fd);
 				if (it != this->_clients.end())
