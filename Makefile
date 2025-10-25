@@ -16,7 +16,10 @@ SRCS = srcs/main.cpp \
 	$(INIT_PATH)/WebServer.cpp \
 	$(INIT_PATH)/ServerSocket.cpp \
 	$(INIT_PATH)/ClientConnection.cpp \
+	$(CONFIG_PATH)/Config.cpp \
 	$(CONFIG_PATH)/ConfigParser.cpp \
+	$(CONFIG_PATH)/LocationConfig.cpp \
+	$(CONFIG_PATH)/ServerConfig.cpp \
 
 OBJS_DIR = objs
 OBJS = $(SRCS:srcs/%.cpp=$(OBJS_DIR)/%.o)
