@@ -38,6 +38,8 @@ void	ConfigParser::parseLocationBlock(std::vector<std::string> const& tokens, st
 
 	while (i < tokens.size())
 	{
+		//std::cout << i << std::endl; //debug
+
 		std::string	token = tokens[i];
 
 		if (tokens[i] == "}")
@@ -115,7 +117,7 @@ void	ConfigParser::parseLocationBlock(std::vector<std::string> const& tokens, st
 			hasUploadPath = true;
 			i += 2;
 		}
-		else if (token == "upload_enabled")
+		else if (token == "upload_enable")
 		{
 			if (hasUploadEnabled)
 				throw std::runtime_error("Duplicate upload_enabled directive in " + path);
@@ -398,10 +400,12 @@ Config	ConfigParser::parseFile(std::string const& configFile)
 	while (i < tokens.size())
 	{
 		if (tokens[i] == "server")
+		{
 			parseServerBlock(tokens, i, config);
+			expect(tokens, i, "}");
+		}
 		else
 			throw std::runtime_error("Unknown directive: " + tokens[i]);
-		expect(tokens, i, "}");
 	}
 	return (config);
 }

@@ -41,49 +41,26 @@ ssize_t	ClientConnection::recvData(void)
 	if (_fd == -1)
 		throw std::runtime_error("error: recvData: fd == -1");
 
-	// char	buffer[1024]; //4096?
-	// ssize_t	bytesRecv;
-
-	// bytesRecv = ::recv(this->_fd, buffer, sizeof(buffer), 0);
-	// if (bytesRecv == -1)
-	// {
-	// 	std::string	errorMsg(strerror(errno));
-	// 	throw std::runtime_error("error: recv: " + errorMsg);
-	// }
-	// if (bytesRecv == 0)
-	// 	return (0);
-	// _requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
-	// //std::cout << _requestBuffer << std::endl; //debug
-	// //RequestParse::handleRawRequest(buffer, _httpRequest); //not working properly
-	// return (bytesRecv);
-// 	{
-// 		throw std::runtime_error("error: recvData: fd == -1");
-// 	}
-
 	char	buffer[4096];
 	ssize_t	bytesRecv;
 
 	bytesRecv = ::recv(this->_fd, buffer, sizeof(buffer), 0);
 	Logger::instance().log(DEBUG, "ClientConnection::recvData bytesRecv -> " + toString(bytesRecv));
-	if (bytesRecv > 0)
+	if (bytesRecv == -1) //ERROR
 	{
-		_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
-		Logger::instance().log(DEBUG,
-			"ClientConnection::recvData appended " + toString(bytesRecv) +
-			" bytes, buffer total = " + toString(_requestBuffer.size()));
-		RequestParse::handleRawRequest(_requestBuffer, _httpRequest, this->getServerConfig());
-		Logger::instance().log(DEBUG, "ClientConnection::recvData request -> " + _requestBuffer);
-		_requestBuffer.clear();
-		return (bytesRecv);
+		std::string	errorMsg(strerror(errno));
+		throw std::runtime_error("error: recv: " + errorMsg);
 	}
-	if (bytesRecv == 0)
+	if (bytesRecv == 0) //EOF
 		return (0);
-	if (errno == EAGAIN || errno == EWOULDBLOCK)
-		return (-1);
-	return (-2);
- 
-	// std::string	errorMsg(strerror(errno));
-	// throw std::runtime_error("error: recv: " + errorMsg);
+	_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
+	Logger::instance().log(DEBUG,
+		"ClientConnection::recvData appended " + toString(bytesRecv) +
+		" bytes, buffer total = " + toString(_requestBuffer.size()));
+	RequestParse::handleRawRequest(_requestBuffer, _httpRequest, this->getServerConfig());
+	Logger::instance().log(DEBUG, "ClientConnection::recvData request -> " + _requestBuffer);
+	_requestBuffer.clear();
+	return (bytesRecv);
 }
 
 ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t toSend)
@@ -99,14 +76,9 @@ ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t
 		std::string	errorMsg(strerror(errno));
 		throw	std::runtime_error("error: send: " + errorMsg);
 	}
-	if (bytesSent >= 0)
-		return (bytesSent);
+	if (bytesSent == 0)
+		return (0);
 	return (bytesSent);
-// 	{
-// 		throw std::runtime_error("error: recvData: fd == -1");
-// 	}
-
-// 	ssize_t	bytesSent;
 
 // 	const std::string& resp = client.getResponseBuffer();
 // 	const char* p = resp.c_str() + sent;
@@ -116,12 +88,6 @@ ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t
 // 	if (bytesSent >= 0)
 // 		return (bytesSent);
 
-// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
-// 		return (-1);
-// 	return (-2);
-
-// 	// std::string	errorMsg(strerror(errno));
-// 	// throw	std::runtime_error("error: send: " + errorMsg);
 }
 
 bool	ClientConnection::completedRequest(void)
@@ -137,10 +103,6 @@ bool	ClientConnection::completedRequest(void)
 	Logger::instance().log(DEBUG, "ClientConnection::completedRequest State -> " +
 		toString(_httpRequest.getState()));
 	return (false);
-
-	// if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
-	// 	return (true);
-	// return (false);
 }
 
 void	ClientConnection::clearBuffer(void) //rename
