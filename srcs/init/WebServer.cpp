@@ -58,7 +58,7 @@ void	WebServer::receiveRequest(size_t i)
 {
 	std::map<int, ClientConnection>::iterator	it;
 	it = this->_clients.find(this->_pollFDs[i].fd);
-	if (it != this->_clients.end()) //should I treat it in case of false?
+	if (it != this->_clients.end())
 	{
 		ClientConnection	&client = it->second;
 		try
@@ -96,6 +96,11 @@ void	WebServer::receiveRequest(size_t i)
 			this->removeClientConnection(client.getFD(), i);
 		}
 	}
+	if (it == _clients.end())
+	{
+		Logger::instance().log(ERROR, "receiveRequest: unknown fd=" + toString(_pollFDs[i].fd));
+		return;
+	}
 }
 
 void	WebServer::sendResponse(size_t i)
@@ -121,7 +126,7 @@ void	WebServer::sendResponse(size_t i)
 			{
 				Logger::instance().log(DEBUG, "WebServer::sendResponse No bytes to send (buffer empty)");
 				this->_pollFDs[i].events = POLLIN;
-				//set revents to 0 too?
+				this->_pollFDs[i].revents = 0;
 				return ; //not sure?
 			}
 			ssize_t	bytesSent = client.sendData(client, sent, toSend);

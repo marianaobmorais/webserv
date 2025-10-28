@@ -47,10 +47,7 @@ ssize_t	ClientConnection::recvData(void)
 	bytesRecv = ::recv(this->_fd, buffer, sizeof(buffer), 0);
 	Logger::instance().log(DEBUG, "ClientConnection::recvData bytesRecv -> " + toString(bytesRecv));
 	if (bytesRecv == -1) //ERROR
-	{
-		std::string	errorMsg(strerror(errno));
-		throw std::runtime_error("error: recv: " + errorMsg);
-	}
+		throw std::runtime_error("recvData: read failure");
 	if (bytesRecv == 0) //EOF
 		return (0);
 	_requestBuffer.append(buffer, bytesRecv); //If the received data has embedded nulls (unlikely in HTTP headers but possible in POST bodies), you’ll not truncate this way
@@ -59,7 +56,7 @@ ssize_t	ClientConnection::recvData(void)
 		" bytes, buffer total = " + toString(_requestBuffer.size()));
 	RequestParse::handleRawRequest(_requestBuffer, _httpRequest, this->getServerConfig());
 	Logger::instance().log(DEBUG, "ClientConnection::recvData request -> " + _requestBuffer);
-	_requestBuffer.clear();
+	//_requestBuffer.clear(); double check this
 	return (bytesRecv);
 }
 
@@ -72,10 +69,7 @@ ssize_t	ClientConnection::sendData(ClientConnection &client, size_t sent, size_t
 
 	bytesSent = send(client.getFD(), client.getResponseBuffer().c_str() + sent, toSend, 0);
 	if (bytesSent == -1)
-	{
-		std::string	errorMsg(strerror(errno));
-		throw	std::runtime_error("error: send: " + errorMsg);
-	}
+		throw	std::runtime_error("sendData: send failure");
 	if (bytesSent == 0)
 		return (0);
 	return (bytesSent);
