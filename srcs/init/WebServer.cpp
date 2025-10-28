@@ -104,9 +104,7 @@ void	WebServer::sendResponse(size_t i)
 
 	std::map<int, ClientConnection>::iterator	it;
 	it = this->_clients.find(this->_pollFDs[i].fd);
-
 	Logger::instance().log(DEBUG, "WebServer::sendResponse FD -> " + toString(this->_pollFDs[i].fd));
-
 	if (it != this->_clients.end()) //should I treat it in case of false?
 	{
 		ClientConnection	&client = it->second;
@@ -142,16 +140,8 @@ void	WebServer::sendResponse(size_t i)
 						this->removeClientConnection(it->second.getFD(), i);
 					}
 					Logger::instance().log(DEBUG, "WebServer::sendResponse back listen");
-					return ;
 				}
 			}
-			if (bytesSent == -1)
-			{
-				this->_pollFDs[i].events = POLLOUT;
-				Logger::instance().log(DEBUG, "WebServer::sendResponse send would block, retry later");
-				return ;
-			}
-
 		}
 		catch (std::exception const& e)
 		{
